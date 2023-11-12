@@ -1,0 +1,5 @@
+/__pycache__/
+/.env/
+/dist/
+/sde/
+/esf_pb2.py

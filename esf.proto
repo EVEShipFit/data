@@ -1,0 +1,105 @@
+syntax = "proto2";
+
+package esf;
+
+message TypeDogma {
+    message TypeDogmaEntry {
+        message DogmaAttributes {
+            required int32 attributeID = 1;
+            required float value = 2;
+        }
+
+        message DogmaEffects {
+            required int32 effectID = 1;
+            required bool isDefault = 2;
+        }
+
+        repeated DogmaAttributes dogmaAttributes = 1;
+        repeated DogmaEffects dogmaEffects = 2;
+    }
+
+    map<int32, TypeDogmaEntry> entries = 1;
+}
+
+message TypeIDs {
+    message TypeID {
+        required string name = 1;
+        required int32 groupID = 2;
+        required int32 categoryID = 3;
+        required bool published = 4;
+
+        optional int32 marketGroupID = 5;
+        optional float capacity = 6;
+        optional float mass = 7;
+        optional float radius = 8;
+        optional float volume = 9;
+    }
+
+    map<int32, TypeID> entries = 1;
+}
+
+message DogmaAttributes {
+    message DogmaAttribute {
+        required string name = 1;
+        required bool published = 2;
+        required float defaultValue = 3;
+        required bool highIsGood = 4;
+        required bool stackable = 5;
+    }
+
+    map<int32, DogmaAttribute> entries = 1;
+}
+
+message DogmaEffects {
+    message DogmaEffect {
+        message ModifierInfo {
+            enum Domain {
+                itemID = 0;
+                shipID = 1;
+                charID = 2;
+                otherID = 3;
+                structureID = 4;
+                target = 5;
+                targetID = 6;
+            }
+
+            enum Func {
+                ItemModifier = 0;
+                LocationGroupModifier = 1;
+                LocationModifier = 2;
+                LocationRequiredSkillModifier = 3;
+                OwnerRequiredSkillModifier = 4;
+                EffectStopper = 5;
+            }
+
+            required Domain domain = 1;
+            required Func func = 2;
+            optional int32 modifiedAttributeID = 3;
+            optional int32 modifyingAttributeID = 4;
+            optional int32 operation = 5;
+            optional int32 groupID = 6;
+            optional int32 skillTypeID = 7;
+        }
+
+        required string name = 1;
+        required int32 effectCategory = 2;
+        required bool electronicChance = 3;
+        required bool isAssistance = 4;
+        required bool isOffensive = 5;
+        required bool isWarpSafe = 6;
+        required bool propulsionChance = 7;
+        required bool rangeChance = 8;
+
+        optional int32 dischargeAttributeID = 9;
+        optional int32 durationAttributeID = 10;
+        optional int32 rangeAttributeID = 11;
+        optional int32 falloffAttributeID = 12;
+        optional int32 trackingSpeedAttributeID = 13;
+        optional int32 fittingUsageChanceAttributeID = 14;
+        optional int32 resistanceAttributeID = 15;
+
+        repeated ModifierInfo modifierInfo = 16;
+    }
+
+    map<int32, DogmaEffect> entries = 1;
+}
