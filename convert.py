@@ -92,8 +92,10 @@ def convert_dogma_attributes(path):
 
     add_esf_attribute(-1, "alignTime")
     add_esf_attribute(-2, "scanStrength")
-    add_esf_attribute(-3, "cpuUsage")
-    add_esf_attribute(-4, "powerUsage")
+    add_esf_attribute(-3, "cpuUsed")
+    add_esf_attribute(-4, "powerUsed")
+    add_esf_attribute(-5, "cpuUnused")
+    add_esf_attribute(-6, "powerUnused")
 
     with open("dist/dogmaAttributes.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
