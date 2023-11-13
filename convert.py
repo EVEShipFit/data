@@ -107,7 +107,13 @@ def convert_dogma_effects(path):
 
     for id, entry in dogmaEffects.items():
         pb2.entries[id].name = entry["effectName"]
-        pb2.entries[id].effectCategory = entry["effectCategory"]
+        # In the SDE, the "online" effect is in the "active" category.
+        # Internally EVE does some magic here; but in our case, it should
+        # always be in the "online" category. So change the effect here.
+        if entry["effectName"] == "online":
+            pb2.entries[id].effectCategory = 4
+        else:
+            pb2.entries[id].effectCategory = entry["effectCategory"]
         pb2.entries[id].electronicChance = entry["electronicChance"]
         pb2.entries[id].isAssistance = entry["isAssistance"]
         pb2.entries[id].isOffensive = entry["isOffensive"]
