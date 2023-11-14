@@ -12,7 +12,7 @@ path = sys.argv[1]
 
 os.makedirs("dist", exist_ok=True)
 
-def convert_type_dogma(path):
+def convert_type_dogma(path, ships):
     with open(f"{path}/typeDogma.yaml") as fp:
         typeDogma = yaml.load(fp, Loader=yaml.CSafeLoader)
 
@@ -35,6 +35,15 @@ def convert_type_dogma(path):
 
             pb2.entries[id].dogmaEffects.append(pbee)
 
+        # Add the "applyVelocityBoost" effect for all ships.
+        if id in ships:
+            pbee = pb2.TypeDogmaEntry.DogmaEffects(
+                effectID=-1,
+                isDefault=False
+            )
+            pb2.entries[id].dogmaEffects.append(pbee)
+
+
     with open("dist/typeDogma.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
@@ -47,12 +56,16 @@ def convert_type_ids(path):
         typeIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
 
     pb2 = esf_pb2.TypeIDs()
+    ships = []
 
     for id, entry in typeIDs.items():
         pb2.entries[id].name = entry["name"]["en"]
         pb2.entries[id].groupID = entry["groupID"]
         pb2.entries[id].categoryID = groupIDs[entry["groupID"]]["categoryID"]
         pb2.entries[id].published = entry["published"]
+
+        if groupIDs[entry["groupID"]]["categoryID"] == 6:
+            ships.append(id)
 
         if "marketGroupID" in entry:
             pb2.entries[id].marketGroupID = entry["marketGroupID"]
@@ -67,6 +80,8 @@ def convert_type_ids(path):
 
     with open("dist/typeIDs.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
+
+    return ships
 
 
 def convert_dogma_attributes(path):
@@ -96,6 +111,7 @@ def convert_dogma_attributes(path):
     add_esf_attribute(-4, "powerUsed")
     add_esf_attribute(-5, "cpuUnused")
     add_esf_attribute(-6, "powerUnused")
+    add_esf_attribute(-7, "velocityBoost")
 
     with open("dist/dogmaAttributes.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
@@ -106,6 +122,34 @@ def convert_dogma_effects(path):
         dogmaEffects = yaml.load(fp, Loader=yaml.CSafeLoader)
 
     pb2 = esf_pb2.DogmaEffects()
+    pbmi = pb2.DogmaEffect.ModifierInfo()
+
+    def add_modifier(id, domain, func, modifiedAttributeID, operation, modifyingAttributeID):
+        pbmi = pb2.DogmaEffect.ModifierInfo()
+
+        pbmi.domain = domain
+        pbmi.func = func
+        pbmi.modifiedAttributeID = modifiedAttributeID
+        pbmi.modifyingAttributeID = modifyingAttributeID
+        pbmi.operation = operation
+
+        pb2.entries[id].modifierInfo.append(pbmi)
+
+
+    # Add the "applyVelocityBoost" effect.
+    pb2.entries[-1].name = "applyVelocityBoost"
+    pb2.entries[-1].effectCategory = 0
+    pb2.entries[-1].electronicChance = 0
+    pb2.entries[-1].isAssistance = False
+    pb2.entries[-1].isOffensive = False
+    pb2.entries[-1].isWarpSafe = True
+    pb2.entries[-1].propulsionChance = 0
+    pb2.entries[-1].rangeChance = 0
+
+    # Final step of applying the velocity bonus.
+    add_modifier(-1, pbmi.Domain.itemID, pbmi.Func.ItemModifier, -7, 5, 4)  # velocityBoost <postDiv> mass
+    add_modifier(-1, pbmi.Domain.itemID, pbmi.Func.ItemModifier, 37, 6, -7)  # maxVelocity <postPercent> velocityBoost
+
 
     for id, entry in dogmaEffects.items():
         pb2.entries[id].name = entry["effectName"]
@@ -172,10 +216,27 @@ def convert_dogma_effects(path):
 
                 pb2.entries[id].modifierInfo.append(pbmi)
 
+
+        # In the SDE, the ABs and MWDs don't have an active modifier effect.
+        # Internally EVE does some magic here; but in our case, these
+        # modifiers can just be assigned to the effects.
+        if entry["effectName"] == "moduleBonusMicrowarpdrive":
+            add_modifier(id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, 552, 6, 554)  # signatureRadius <postPercent> signatureRadiusBonus
+
+        if entry["effectName"] == "moduleBonusAfterburner" or entry["effectName"] == "moduleBonusMicrowarpdrive":
+            add_modifier(id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, 4, 2, 796)  # mass <modAdd> massAddition
+
+            # Velocity change is calculated like this: velocityBoost = item.speedFactor * item.speedBoostFactor / ship.mass
+            # First, calculate the multiplication on the item.
+            add_modifier(id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, -7, -1, 567)  # velocityBoost <preAssign> speedBoostFactor
+            add_modifier(id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, -7, 4, 20)  # velocityBoost <postMul> speedFactor
+
+            # Next, "applyVelocityBoost" is applied on all ships which takes care of the final calculation (as mass is an attribute of the ship).
+
     with open("dist/dogmaEffects.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
-convert_type_dogma(path)
-convert_type_ids(path)
+ships = convert_type_ids(path)
+convert_type_dogma(path, ships)
 convert_dogma_attributes(path)
 convert_dogma_effects(path)
