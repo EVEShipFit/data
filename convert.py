@@ -112,6 +112,13 @@ def convert_dogma_attributes(path):
     add_esf_attribute(-5, "cpuUnused")
     add_esf_attribute(-6, "powerUnused")
     add_esf_attribute(-7, "velocityBoost")
+    add_esf_attribute(-8, "shieldEhpMultiplier")
+    add_esf_attribute(-9, "armorEhpMultiplier")
+    add_esf_attribute(-10, "hullEhpMultiplier")
+    add_esf_attribute(-11, "shieldEhp")
+    add_esf_attribute(-12, "armorEhp")
+    add_esf_attribute(-13, "hullEhp")
+    add_esf_attribute(-14, "ehp")
 
     with open("dist/dogmaAttributes.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
