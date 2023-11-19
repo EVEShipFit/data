@@ -102,7 +102,7 @@ def convert_dogma_attributes(path):
         pb2.entries[id].name = name
         pb2.entries[id].published = True
         pb2.entries[id].defaultValue = 0
-        pb2.entries[id].highIsGood = True
+        pb2.entries[id].highIsGood = False
         pb2.entries[id].stackable = False
 
     add_esf_attribute(-1, "alignTime")
