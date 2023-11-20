@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  release:
+    types:
+    - published
+
+jobs:
+  datafiles:
+    name: Publish datafiles
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y --no-install-recommends rclone protobuf-compiler
+        pip install -r requirements.txt
+
+    - name: Setup rclone
+      run: |
+        mkdir -p ~/.config/rclone
+
+        echo "[eveshipfit]" > ~/.config/rclone/rclone.conf
+        echo "type = s3" >> ~/.config/rclone/rclone.conf
+        echo "provider = Cloudflare" >> ~/.config/rclone/rclone.conf
+        echo "acl = private" >> ~/.config/rclone/rclone.conf
+        echo "no_check_bucket = true" >> ~/.config/rclone/rclone.conf
+
+    - name: Fetch SDE
+      run: |
+        wget -q https://eve-static-data-export.s3-eu-west-1.amazonaws.com/tranquility/sde.zip
+        unzip sde.zip
+
+    - name: Validate SDE version
+      run: |
+        SDE_VERSION=$(date -r sde.zip "+%F" | sed 's/-//g')
+        RELEASE_SDE_VERSION=$(echo ${{ github.event.release.tag_name }} | cut -d- -f2)
+
+        echo "SDK version: ${SDE_VERSION}"
+        echo "Release version: ${RELEASE_SDE_VERSION}"
+
+        if [ "${SDE_VERSION}" != "${RELEASE_SDE_VERSION}" ]; then
+          echo "SDE version mismatch: ${SDE_VERSION} != ${RELEASE_SDE_VERSION}"
+          exit 1
+        fi
+
+    - name: Convert SDE YAML to Protobuf
+      run: |
+        protoc --python_out=. esf.proto
+        python convert.py sde/fsd
+
+    - name: Fetch icons
+      run: |
+        python download_icons.py
+
+    - name: Publish to R2 bucket
+      run: |
+        rclone copy dist eveshipfit:eveshipfit/${{ github.event.release.tag_name }}/ --progress
+      env:
+        RCLONE_CONFIG_EVESHIPFIT_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+        RCLONE_CONFIG_EVESHIPFIT_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        RCLONE_CONFIG_EVESHIPFIT_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
