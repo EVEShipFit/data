@@ -35,15 +35,6 @@ The EVE SDE has some quirks, that are easiest fixed in the conversion.
 - TypeID entries are matched to a GroupID, which is matched to a Category.
   This makes finding all types of a certain category (like: all skills) time consuming.
   As such, `CategoryID` is added to every TypeID entry, which is the same as the category of the group it is in.
-- A few attributes are added to every hull, which are calculated by the `dogma-engine`.
-  They carry negative IDs, to make it more visible they are calculated by the `dogma-engine`, and are not part of the EVE SDE.
-  - `-1`: `alignTime` - seconds needed to align for warp.
-  - `-2`: `scanStrength` - there are four types of scan-strengths; this is given the highest value of those four.
-  - `-3`: `cpuUsed` - how much CPU is in use.
-  - `-4`: `powerUsed` - how much Power Grid is in use.
-  - `-5`: `cpuUnused` - how much CPU is left unused.
-  - `-6`: `powerUnused` - how much Power Grid is left unused.
-  - `-7`: `velocityBoost` - how much (in percent) the velocity will be boosted (for AB / MWD calculations).
 - The effect `online` is in the category `active` (for internal EVE reasons).
   But this confuses the `dogma-engine` in calculating the possible states a module can have.
   As such, the category is changed to `online`.
@@ -60,3 +51,27 @@ The EVE SDE has some quirks, that are easiest fixed in the conversion.
     As a solution, two things are changed:
     - Two modifiers are added which result attribute `-7` on the ship to be the `item.speedFactor * item.speedBoostFactor` part.
     - A new effect (`-1`: `applyVelocityBoost`) is added to all ships, which add two modifiers to do the rest: `/ ship.mass` and applying as `postPercent` to `maxVelocity`.
+- A few attributes are added to every hull, which are calculated by the `dogma-engine`.
+  They carry negative IDs, to make it more visible they are calculated by the `dogma-engine`, and are not part of the EVE SDE.
+  - `-1`: `alignTime` - seconds needed to align for warp.
+  - `-2`: `scanStrength` - there are four types of scan-strengths; this is given the highest value of those four.
+  - `-3`: `cpuUsed` - how much CPU is in use.
+  - `-4`: `powerUsed` - how much Power Grid is in use.
+  - `-5`: `cpuUnused` - how much CPU is left unused.
+  - `-6`: `powerUnused` - how much Power Grid is left unused.
+  - `-7`: `velocityBoost` - how much (in percent) the velocity will be boosted (for AB / MWD calculations).
+  - `-8`: `shieldEhpMultiplier` - multiplier to convert shield HP to shield eHP.
+  - `-9`: `armorEhpMultiplier` - multiplier to convert armor HP to armor eHP.
+  - `-10`: `hullEhpMultiplier` - multiplier to convert hull HP to hull eHP.
+  - `-11`: `shieldEhp` - shield eHP.
+  - `-12`: `armorEhp` - armor eHP.
+  - `-13`: `hullEhp` - hull eHP.
+  - `-14`: `ehp` - total (shield + armor + hull) eHP.
+  - `-15`: `passiveShieldRecharge` - passive shield recharge (in HP/s).
+  - `-16`: `shieldBoostRate` - shield boost rate (in HP/s).
+  - `-17`: `armorRepairRate` - armor repair rate (in HP/s).
+  - `-18`: `hullRepairRate` - hull repair rate (in HP/s).
+  - `-19`: `passiveShieldRechargeEhp` - passive shield recharge (in eHP/s).
+  - `-20`: `shieldBoostRateEhp` - shield boost rate (in eHP/s).
+  - `-21`: `armorRepairRateEhp` - armor repair rate (in eHP/s).
+  - `-22`: `hullRepairRateEhp` - hull repair rate (in eHP/s).
