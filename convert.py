@@ -10,9 +10,12 @@ if len(sys.argv) < 2:
 
 path = sys.argv[1]
 
-os.makedirs("dist", exist_ok=True)
+os.makedirs("dist/sde", exist_ok=True)
+
 
 def convert_type_dogma(path, ships):
+    print("Converting typeDogma ...")
+
     with open(f"{path}/typeDogma.yaml") as fp:
         typeDogma = yaml.load(fp, Loader=yaml.CSafeLoader)
 
@@ -20,35 +23,27 @@ def convert_type_dogma(path, ships):
 
     for id, entry in typeDogma.items():
         for attribute in entry["dogmaAttributes"]:
-            pbea = pb2.TypeDogmaEntry.DogmaAttributes(
-                attributeID=attribute["attributeID"],
-                value=attribute["value"]
-            )
+            pbea = pb2.TypeDogmaEntry.DogmaAttributes(attributeID=attribute["attributeID"], value=attribute["value"])
 
             pb2.entries[id].dogmaAttributes.append(pbea)
 
         for effect in entry["dogmaEffects"]:
-            pbee = pb2.TypeDogmaEntry.DogmaEffects(
-                effectID=effect["effectID"],
-                isDefault=effect["isDefault"]
-            )
+            pbee = pb2.TypeDogmaEntry.DogmaEffects(effectID=effect["effectID"], isDefault=effect["isDefault"])
 
             pb2.entries[id].dogmaEffects.append(pbee)
 
         # Add the "applyVelocityBoost" effect for all ships.
         if id in ships:
-            pbee = pb2.TypeDogmaEntry.DogmaEffects(
-                effectID=-1,
-                isDefault=False
-            )
+            pbee = pb2.TypeDogmaEntry.DogmaEffects(effectID=-1, isDefault=False)
             pb2.entries[id].dogmaEffects.append(pbee)
 
-
-    with open("dist/typeDogma.pb2", "wb") as fp:
+    with open("dist/sde/typeDogma.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
 
 def convert_type_ids(path):
+    print("Converting typeIDs ...")
+
     with open(f"{path}/groupIDs.yaml") as fp:
         groupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
 
@@ -78,13 +73,15 @@ def convert_type_ids(path):
         if "volume" in entry:
             pb2.entries[id].volume = entry["volume"]
 
-    with open("dist/typeIDs.pb2", "wb") as fp:
+    with open("dist/sde/typeIDs.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
     return ships
 
 
 def convert_dogma_attributes(path):
+    print("Converting dogmaAttributes ...")
+
     with open(f"{path}/dogmaAttributes.yaml") as fp:
         dogmaAttributes = yaml.load(fp, Loader=yaml.CSafeLoader)
 
@@ -128,11 +125,13 @@ def convert_dogma_attributes(path):
     add_esf_attribute(-21, "armorRepairRateEhp")
     add_esf_attribute(-22, "hullRepairRateEhp")
 
-    with open("dist/dogmaAttributes.pb2", "wb") as fp:
+    with open("dist/sde/dogmaAttributes.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
 
 def convert_dogma_effects(path):
+    print("Converting dogmaEffects ...")
+
     with open(f"{path}/dogmaEffects.yaml") as fp:
         dogmaEffects = yaml.load(fp, Loader=yaml.CSafeLoader)
 
@@ -150,7 +149,6 @@ def convert_dogma_effects(path):
 
         pb2.entries[id].modifierInfo.append(pbmi)
 
-
     # Add the "applyVelocityBoost" effect.
     pb2.entries[-1].name = "applyVelocityBoost"
     pb2.entries[-1].effectCategory = 0
@@ -164,7 +162,6 @@ def convert_dogma_effects(path):
     # Final step of applying the velocity bonus.
     add_modifier(-1, pbmi.Domain.itemID, pbmi.Func.ItemModifier, -7, 5, 4)  # velocityBoost <postDiv> mass
     add_modifier(-1, pbmi.Domain.itemID, pbmi.Func.ItemModifier, 37, 6, -7)  # maxVelocity <postPercent> velocityBoost
-
 
     for id, entry in dogmaEffects.items():
         pb2.entries[id].name = entry["effectName"]
@@ -202,21 +199,34 @@ def convert_dogma_effects(path):
                 pbmi = pb2.DogmaEffect.ModifierInfo()
 
                 match modifier_info["domain"]:
-                    case "itemID": pbmi.domain = pbmi.Domain.itemID
-                    case "shipID": pbmi.domain = pbmi.Domain.shipID
-                    case "charID": pbmi.domain = pbmi.Domain.charID
-                    case "otherID": pbmi.domain = pbmi.Domain.otherID
-                    case "structureID": pbmi.domain = pbmi.Domain.structureID
-                    case "target": pbmi.domain = pbmi.Domain.target
-                    case "targetID": pbmi.domain = pbmi.Domain.targetID
+                    case "itemID":
+                        pbmi.domain = pbmi.Domain.itemID
+                    case "shipID":
+                        pbmi.domain = pbmi.Domain.shipID
+                    case "charID":
+                        pbmi.domain = pbmi.Domain.charID
+                    case "otherID":
+                        pbmi.domain = pbmi.Domain.otherID
+                    case "structureID":
+                        pbmi.domain = pbmi.Domain.structureID
+                    case "target":
+                        pbmi.domain = pbmi.Domain.target
+                    case "targetID":
+                        pbmi.domain = pbmi.Domain.targetID
 
                 match modifier_info["func"]:
-                    case "ItemModifier": pbmi.func = pbmi.Func.ItemModifier
-                    case "LocationGroupModifier": pbmi.func = pbmi.Func.LocationGroupModifier
-                    case "LocationModifier": pbmi.func = pbmi.Func.LocationModifier
-                    case "LocationRequiredSkillModifier": pbmi.func = pbmi.Func.LocationRequiredSkillModifier
-                    case "OwnerRequiredSkillModifier": pbmi.func = pbmi.Func.OwnerRequiredSkillModifier
-                    case "EffectStopper": pbmi.func = pbmi.Func.EffectStopper
+                    case "ItemModifier":
+                        pbmi.func = pbmi.Func.ItemModifier
+                    case "LocationGroupModifier":
+                        pbmi.func = pbmi.Func.LocationGroupModifier
+                    case "LocationModifier":
+                        pbmi.func = pbmi.Func.LocationModifier
+                    case "LocationRequiredSkillModifier":
+                        pbmi.func = pbmi.Func.LocationRequiredSkillModifier
+                    case "OwnerRequiredSkillModifier":
+                        pbmi.func = pbmi.Func.OwnerRequiredSkillModifier
+                    case "EffectStopper":
+                        pbmi.func = pbmi.Func.EffectStopper
 
                 if "modifiedAttributeID" in modifier_info:
                     pbmi.modifiedAttributeID = modifier_info["modifiedAttributeID"]
@@ -231,25 +241,31 @@ def convert_dogma_effects(path):
 
                 pb2.entries[id].modifierInfo.append(pbmi)
 
-
         # In the SDE, the ABs and MWDs don't have an active modifier effect.
         # Internally EVE does some magic here; but in our case, these
         # modifiers can just be assigned to the effects.
         if entry["effectName"] == "moduleBonusMicrowarpdrive":
-            add_modifier(id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, 552, 6, 554)  # signatureRadius <postPercent> signatureRadiusBonus
+            add_modifier(
+                id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, 552, 6, 554
+            )  # signatureRadius <postPercent> signatureRadiusBonus
 
         if entry["effectName"] == "moduleBonusAfterburner" or entry["effectName"] == "moduleBonusMicrowarpdrive":
             add_modifier(id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, 4, 2, 796)  # mass <modAdd> massAddition
 
             # Velocity change is calculated like this: velocityBoost = item.speedFactor * item.speedBoostFactor / ship.mass
             # First, calculate the multiplication on the item.
-            add_modifier(id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, -7, -1, 567)  # velocityBoost <preAssign> speedBoostFactor
-            add_modifier(id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, -7, 4, 20)  # velocityBoost <postMul> speedFactor
+            add_modifier(
+                id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, -7, -1, 567
+            )  # velocityBoost <preAssign> speedBoostFactor
+            add_modifier(
+                id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, -7, 4, 20
+            )  # velocityBoost <postMul> speedFactor
 
             # Next, "applyVelocityBoost" is applied on all ships which takes care of the final calculation (as mass is an attribute of the ship).
 
-    with open("dist/dogmaEffects.pb2", "wb") as fp:
+    with open("dist/sde/dogmaEffects.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
+
 
 ships = convert_type_ids(path)
 convert_type_dogma(path, ships)
