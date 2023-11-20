@@ -26,4 +26,4 @@ for line in resfile.split("\n"):
 
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
         with open(local_path, "wb") as f:
-            f.write(requests.get(f"https://binaries.eveonline.com/{path}").content)
+            f.write(requests.get(f"https://resources.eveonline.com/{path}").content)
