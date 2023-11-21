@@ -30,6 +30,11 @@ jobs:
         echo "acl = private" >> ~/.config/rclone/rclone.conf
         echo "no_check_bucket = true" >> ~/.config/rclone/rclone.conf
 
+    - name: Add mimetype for pb2
+      run: |
+        echo "application/x-protobuf pb2" | sudo tee -a /etc/mime.types
+        echo "80:application/x-protobuf:*.pb2" | sudo tee -a /usr/share/mime/globs2
+
     - name: Fetch SDE
       run: |
         wget -q https://eve-static-data-export.s3-eu-west-1.amazonaws.com/tranquility/sde.zip
