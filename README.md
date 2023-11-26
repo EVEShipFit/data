@@ -13,7 +13,7 @@ This is exported to Python and Javascript with the following commands:
 
 ```bash
 protoc --python_out=. esf.proto
-web/node_modules/.bin/pbjs -t static-module -w es6 -o esf_pb2.js esf.proto --no-create --no-encode --no-verify --no-convert --no-delimited --no-typeurl --no-beautify --no-comments --no-service
+npx pbjs -t static-module -w es6 -o esf_pb2.js esf.proto --no-create --no-encode --no-verify --no-convert --no-delimited --no-typeurl --no-beautify --no-comments --no-service
 ```
 
 ## Converting

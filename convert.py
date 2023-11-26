@@ -79,6 +79,26 @@ def convert_type_ids(path):
     return ships
 
 
+def convert_group_ids(path):
+    print("Converting groupIDs ...")
+
+    with open(f"{path}/groupIDs.yaml") as fp:
+        groupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+
+    pb2 = esf_pb2.GroupIDs()
+    ships = []
+
+    for id, entry in groupIDs.items():
+        pb2.entries[id].name = entry["name"]["en"]
+        pb2.entries[id].categoryID = entry["categoryID"]
+        pb2.entries[id].published = entry["published"]
+
+    with open("dist/sde/groupIDs.pb2", "wb") as fp:
+        fp.write(pb2.SerializeToString())
+
+    return ships
+
+
 def convert_dogma_attributes(path):
     print("Converting dogmaAttributes ...")
 
@@ -267,6 +287,7 @@ def convert_dogma_effects(path):
         fp.write(pb2.SerializeToString())
 
 
+convert_group_ids(path)
 ships = convert_type_ids(path)
 convert_type_dogma(path, ships)
 convert_dogma_attributes(path)
