@@ -62,6 +62,8 @@ def convert_type_ids(path):
         if groupIDs[entry["groupID"]]["categoryID"] == 6:
             ships.append(id)
 
+        if "factionID" in entry:
+            pb2.entries[id].factionID = entry["factionID"]
         if "marketGroupID" in entry:
             pb2.entries[id].marketGroupID = entry["marketGroupID"]
         if "capacity" in entry:
