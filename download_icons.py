@@ -21,7 +21,7 @@ for line in resfile.split("\n"):
 
     res, path, _, _, _ = line.split(",")
 
-    if res.startswith("res:/ui/texture/classes/fitting/"):
+    if res.endswith(".png") and res.startswith("res:/ui/texture/classes/fitting/"):
         filename = res.split(":")[1][1:]
         print(f"Downloading {filename} ...")
         local_path = "dist/" + filename
