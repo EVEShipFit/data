@@ -48,6 +48,16 @@ message GroupIDs {
     map<int32, GroupID> entries = 1;
 }
 
+message MarketGroups {
+    message MarketGroup {
+        required string name = 1;
+
+        optional int32 parentGroupID = 2;
+    }
+
+    map<int32, MarketGroup> entries = 1;
+}
+
 message DogmaAttributes {
     message DogmaAttribute {
         required string name = 1;

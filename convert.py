@@ -86,7 +86,6 @@ def convert_group_ids(path):
         groupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
 
     pb2 = esf_pb2.GroupIDs()
-    ships = []
 
     for id, entry in groupIDs.items():
         pb2.entries[id].name = entry["name"]["en"]
@@ -94,6 +93,26 @@ def convert_group_ids(path):
         pb2.entries[id].published = entry["published"]
 
     with open("dist/sde/groupIDs.pb2", "wb") as fp:
+        fp.write(pb2.SerializeToString())
+
+    return ships
+
+
+def convert_market_groups(path):
+    print("Converting marketGroups ...")
+
+    with open(f"{path}/marketGroups.yaml") as fp:
+        marketGroupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+
+    pb2 = esf_pb2.MarketGroups()
+
+    for id, entry in marketGroupIDs.items():
+        pb2.entries[id].name = entry["nameID"]["en"]
+
+        if "parentGroupID" in entry:
+            pb2.entries[id].parentGroupID = entry["parentGroupID"]
+
+    with open("dist/sde/marketGroups.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
     return ships
@@ -288,6 +307,7 @@ def convert_dogma_effects(path):
 
 
 convert_group_ids(path)
+convert_market_groups(path)
 ships = convert_type_ids(path)
 convert_type_dogma(path, ships)
 convert_dogma_attributes(path)
