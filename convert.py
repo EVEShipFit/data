@@ -95,8 +95,6 @@ def convert_group_ids(path):
     with open("dist/sde/groupIDs.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
-    return ships
-
 
 def convert_market_groups(path):
     print("Converting marketGroups ...")
@@ -114,8 +112,6 @@ def convert_market_groups(path):
 
     with open("dist/sde/marketGroups.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
-
-    return ships
 
 
 def convert_dogma_attributes(path):
