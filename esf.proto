@@ -28,11 +28,12 @@ message TypeIDs {
         required int32 categoryID = 3;
         required bool published = 4;
 
-        optional int32 marketGroupID = 5;
-        optional float capacity = 6;
-        optional float mass = 7;
-        optional float radius = 8;
-        optional float volume = 9;
+        optional int32 factionID = 5;
+        optional int32 marketGroupID = 6;
+        optional float capacity = 7;
+        optional float mass = 8;
+        optional float radius = 9;
+        optional float volume = 10;
     }
 
     map<int32, TypeID> entries = 1;
