@@ -38,6 +38,16 @@ message TypeIDs {
     map<int32, TypeID> entries = 1;
 }
 
+message GroupIDs {
+    message GroupID {
+        required string name = 1;
+        required int32 categoryID = 2;
+        required bool published = 3;
+    }
+
+    map<int32, GroupID> entries = 1;
+}
+
 message DogmaAttributes {
     message DogmaAttribute {
         required string name = 1;
