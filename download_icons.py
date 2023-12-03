@@ -20,6 +20,9 @@ files = {}
 with open(f"{path}/marketGroups.yaml") as fp:
     marketGroups = yaml.load(fp, Loader=yaml.CSafeLoader)
 
+with open(f"{path}/metaGroups.yaml") as fp:
+    metaGroups = yaml.load(fp, Loader=yaml.CSafeLoader)
+
 with open(f"{path}/iconIDs.yaml") as fp:
     iconIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
 
@@ -36,6 +39,13 @@ for marketGroupID, marketGroup in marketGroups.items():
 
     filename = iconIDs[marketGroup["iconID"]]["iconFile"].lower()
     files[filename] = f"icons/{marketGroup['iconID']}"
+
+for metaGroup in metaGroups.values():
+    if "iconID" not in metaGroup or metaGroup["iconID"] == 0:
+        continue
+
+    filename = iconIDs[metaGroup["iconID"]]["iconFile"].lower()
+    files[filename] = f"icons/{metaGroup['iconID']}"
 
 latest = requests.get("https://binaries.eveonline.com/eveclient_TQ.json").json()
 build = latest["build"]
