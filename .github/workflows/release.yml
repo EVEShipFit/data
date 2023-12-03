@@ -60,7 +60,7 @@ jobs:
 
     - name: Fetch icons
       run: |
-        python download_icons.py
+        python download_icons.py sde/fsd
 
     - name: Publish to R2 bucket
       run: |
