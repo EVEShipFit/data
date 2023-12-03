@@ -30,10 +30,11 @@ message TypeIDs {
 
         optional int32 factionID = 5;
         optional int32 marketGroupID = 6;
-        optional float capacity = 7;
-        optional float mass = 8;
-        optional float radius = 9;
-        optional float volume = 10;
+        optional int32 metaGroupID = 7;
+        optional float capacity = 8;
+        optional float mass = 9;
+        optional float radius = 10;
+        optional float volume = 11;
     }
 
     map<int32, TypeID> entries = 1;
