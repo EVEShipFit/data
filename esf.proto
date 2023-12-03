@@ -55,6 +55,7 @@ message MarketGroups {
         required string name = 1;
 
         optional int32 parentGroupID = 2;
+        optional int32 iconID = 3;
     }
 
     map<int32, MarketGroup> entries = 1;
