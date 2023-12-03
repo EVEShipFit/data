@@ -66,6 +66,8 @@ def convert_type_ids(path):
             pb2.entries[id].factionID = entry["factionID"]
         if "marketGroupID" in entry:
             pb2.entries[id].marketGroupID = entry["marketGroupID"]
+        if "metaGroupID" in entry:
+            pb2.entries[id].metaGroupID = entry["metaGroupID"]
         if "capacity" in entry:
             pb2.entries[id].capacity = entry["capacity"]
         if "mass" in entry:
