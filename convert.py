@@ -113,6 +113,8 @@ def convert_market_groups(path):
 
         if "parentGroupID" in entry:
             pb2.entries[id].parentGroupID = entry["parentGroupID"]
+        if "iconID" in entry:
+            pb2.entries[id].iconID = entry["iconID"]
 
     with open("dist/sde/marketGroups.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
