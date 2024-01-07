@@ -75,3 +75,7 @@ The EVE SDE has some quirks, that are easiest fixed in the conversion.
   - `-20`: `shieldBoostRateEhp` - shield boost rate (in eHP/s).
   - `-21`: `armorRepairRateEhp` - armor repair rate (in eHP/s).
   - `-22`: `hullRepairRateEhp` - hull repair rate (in eHP/s).
+  - `-23`: `capacitorPeakRecharge` - peak recharge of capacitor (in GJ/s).
+  - `-24`: `capacitorPeakUsage` - peak usage of capacitor (in GJ/s), when all modules would activate at the same time.
+  - `-25`: `capacitorPeakDelta` - delta between peak recharge and usage (in GJ/s).
+  - `-26`: `capacitorPeakDeltaPercentage` - delta between peak recharge and usage in percentage against peak recharge.
