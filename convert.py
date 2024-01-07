@@ -165,6 +165,10 @@ def convert_dogma_attributes(path):
     add_esf_attribute(-20, "shieldBoostRateEhp")
     add_esf_attribute(-21, "armorRepairRateEhp")
     add_esf_attribute(-22, "hullRepairRateEhp")
+    add_esf_attribute(-23, "capacitorPeakRecharge")
+    add_esf_attribute(-24, "capacitorPeakUsage")
+    add_esf_attribute(-25, "capacitorPeakDelta")
+    add_esf_attribute(-26, "capacitorPeakDeltaPercentage")
 
     with open("dist/sde/dogmaAttributes.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
