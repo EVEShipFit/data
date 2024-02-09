@@ -79,3 +79,4 @@ The EVE SDE has some quirks, that are easiest fixed in the conversion.
   - `-24`: `capacitorPeakUsage` - peak usage of capacitor (in GJ/s), when all modules would activate at the same time.
   - `-25`: `capacitorPeakDelta` - delta between peak recharge and usage (in GJ/s).
   - `-26`: `capacitorPeakDeltaPercentage` - delta between peak recharge and usage in percentage against peak recharge.
+  - `-27`: `capacitorDepletesIn` - if capacitor is unstable, amount of seconds till the capacitor is drained.
