@@ -169,6 +169,7 @@ def convert_dogma_attributes(path):
     add_esf_attribute(-24, "capacitorPeakUsage")
     add_esf_attribute(-25, "capacitorPeakDelta")
     add_esf_attribute(-26, "capacitorPeakDeltaPercentage")
+    add_esf_attribute(-27, "capacitorDepletesIn")
 
     with open("dist/sde/dogmaAttributes.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
