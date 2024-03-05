@@ -32,9 +32,14 @@ def convert_type_dogma(path, ships):
 
             pb2.entries[id].dogmaEffects.append(pbee)
 
-        # Add the "applyVelocityBoost" effect for all ships.
         if id in ships:
+            # Add the "applyVelocityBoost" effect for all ships.
             pbee = pb2.TypeDogmaEntry.DogmaEffects(effectID=-1, isDefault=False)
+            pb2.entries[id].dogmaEffects.append(pbee)
+
+        if id == 1373:  # 1373 - Character
+            # Add the "applyMissileDamage" effect for chars.
+            pbee = pb2.TypeDogmaEntry.DogmaEffects(effectID=-2, isDefault=False)
             pb2.entries[id].dogmaEffects.append(pbee)
 
     with open("dist/sde/typeDogma.pb2", "wb") as fp:
@@ -170,6 +175,9 @@ def convert_dogma_attributes(path):
     add_esf_attribute(-25, "capacitorPeakDelta")
     add_esf_attribute(-26, "capacitorPeakDeltaPercentage")
     add_esf_attribute(-27, "capacitorDepletesIn")
+    add_esf_attribute(-28, "damageWithoutReloadDps")
+    add_esf_attribute(-29, "damageWithReloadDps")
+    add_esf_attribute(-30, "damageAlphaHp")
 
     with open("dist/sde/dogmaAttributes.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
@@ -184,7 +192,7 @@ def convert_dogma_effects(path):
     pb2 = esf_pb2.DogmaEffects()
     pbmi = pb2.DogmaEffect.ModifierInfo()
 
-    def add_modifier(id, domain, func, modifiedAttributeID, operation, modifyingAttributeID):
+    def add_modifier(id, domain, func, modifiedAttributeID, operation, modifyingAttributeID, **kwargs):
         pbmi = pb2.DogmaEffect.ModifierInfo()
 
         pbmi.domain = domain
@@ -192,6 +200,9 @@ def convert_dogma_effects(path):
         pbmi.modifiedAttributeID = modifiedAttributeID
         pbmi.modifyingAttributeID = modifyingAttributeID
         pbmi.operation = operation
+
+        for key, value in kwargs.items():
+            setattr(pbmi, key, value)
 
         pb2.entries[id].modifierInfo.append(pbmi)
 
@@ -208,6 +219,29 @@ def convert_dogma_effects(path):
     # Final step of applying the velocity bonus.
     add_modifier(-1, pbmi.Domain.itemID, pbmi.Func.ItemModifier, -7, 5, 4)  # velocityBoost <postDiv> mass
     add_modifier(-1, pbmi.Domain.itemID, pbmi.Func.ItemModifier, 37, 6, -7)  # maxVelocity <postPercent> velocityBoost
+
+    # Add the "applyMissileDamage" effect.
+    pb2.entries[-2].name = "applyMissileDamage"
+    pb2.entries[-2].effectCategory = 0
+    pb2.entries[-2].electronicChance = 0
+    pb2.entries[-2].isAssistance = False
+    pb2.entries[-2].isOffensive = True
+    pb2.entries[-2].isWarpSafe = True
+    pb2.entries[-2].propulsionChance = 0
+    pb2.entries[-2].rangeChance = 0
+
+    add_modifier(
+        -2, pbmi.Domain.charID, pbmi.Func.OwnerRequiredSkillModifier, 114, 4, 212, skillTypeID=3319
+    )  # emDamage <postMul> missileDamageMultiplier for Missile Launcher Operation skill
+    add_modifier(
+        -2, pbmi.Domain.charID, pbmi.Func.OwnerRequiredSkillModifier, 116, 4, 212, skillTypeID=3319
+    )  # explosiveDamage <postMul> missileDamageMultiplier for Missile Launcher Operation skill
+    add_modifier(
+        -2, pbmi.Domain.charID, pbmi.Func.OwnerRequiredSkillModifier, 117, 4, 212, skillTypeID=3319
+    )  # kineticDamage <postMul> missileDamageMultiplier for Missile Launcher Operation skill
+    add_modifier(
+        -2, pbmi.Domain.charID, pbmi.Func.OwnerRequiredSkillModifier, 118, 4, 212, skillTypeID=3319
+    )  # thermalDamage <postMul> missileDamageMultiplier for Missile Launcher Operation skill
 
     for id, entry in dogmaEffects.items():
         pb2.entries[id].name = entry["effectName"]
@@ -308,6 +342,34 @@ def convert_dogma_effects(path):
             )  # velocityBoost <postMul> speedFactor
 
             # Next, "applyVelocityBoost" is applied on all ships which takes care of the final calculation (as mass is an attribute of the ship).
+
+        # missileEMDmgBonus, missileExplosiveDmgBonus, missileKineticDmgBonus, missileThermalDmgBonus don't apply
+        # any effect direct, but this is handled internally in EVE. For us,
+        # it is better to just make it an effect.
+        damageType = {
+            "missileEMDmgBonus": 114,
+            "missileExplosiveDmgBonus": 116,
+            "missileKineticDmgBonus2": 117,
+            "missileThermalDmgBonus": 118,
+        }
+        if entry["effectName"] in damageType.keys():
+            add_modifier(
+                id,
+                pbmi.Domain.charID,
+                pbmi.Func.OwnerRequiredSkillModifier,
+                damageType[entry["effectName"]],
+                6,
+                292,
+                skillTypeID=-1,
+            )  # <damageType>Damage <postPercent> damageMultiplierBonus for skill in question.
+        if entry["effectName"] == "selfRof":
+            add_modifier(
+                id, pbmi.Domain.shipID, pbmi.Func.LocationRequiredSkillModifier, 51, 6, 293, skillTypeID=-1
+            )  # speed <postPercent> rofBonus for skill in question.
+        if entry["effectName"] == "droneDmgBonus":
+            add_modifier(
+                id, pbmi.Domain.charID, pbmi.Func.OwnerRequiredSkillModifier, 64, 6, 292, skillTypeID=-1
+            )  # damageMultiplier <postPercent> damageMultiplierBonus for skill in question.
 
     with open("dist/sde/dogmaEffects.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
