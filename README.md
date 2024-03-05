@@ -51,6 +51,13 @@ The EVE SDE has some quirks, that are easiest fixed in the conversion.
     As a solution, two things are changed:
     - Two modifiers are added which result attribute `-7` on the ship to be the `item.speedFactor * item.speedBoostFactor` part.
     - A new effect (`-1`: `applyVelocityBoost`) is added to all ships, which add two modifiers to do the rest: `/ ship.mass` and applying as `postPercent` to `maxVelocity`.
+- Some Missile skills have no active effect modifier in the SDE (as they are handled specially internally in EVE).
+  To address this, for these skill, an extra effect is applied.
+  The function `OwnerRequiredSkillModifier` with a SkillID of `-1` is used to indicate the effect should be applied based on the current skill.
+  Similar, `selfRof` and `droneDmgBonus` have no effects applied.
+  These are changed in a similar way.
+- Some missile attributes are applied to CharID, and not to the charge.
+  The new effect (`-2`: `applyMissileDamage`) is added to the character, which applies `missileDamageMultiplier` to all four damage types on all charges that need `Missile Launcher Operation` skill.
 - A few attributes are added to every hull, which are calculated by the `dogma-engine`.
   They carry negative IDs, to make it more visible they are calculated by the `dogma-engine`, and are not part of the EVE SDE.
   - `-1`: `alignTime` - seconds needed to align for warp.
@@ -80,3 +87,6 @@ The EVE SDE has some quirks, that are easiest fixed in the conversion.
   - `-25`: `capacitorPeakDelta` - delta between peak recharge and usage (in GJ/s).
   - `-26`: `capacitorPeakDeltaPercentage` - delta between peak recharge and usage in percentage against peak recharge.
   - `-27`: `capacitorDepletesIn` - if capacitor is unstable, amount of seconds till the capacitor is drained.
+  - `-28`: `damageWithoutReloadDps` - the total DPS without reloading.
+  - `-29`: `damageWithReloadDps` - the total DPS with reloading.
+  - `-30`: `damageAlphaHp` - the damage done when all guns shoot at once.
