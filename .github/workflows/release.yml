@@ -12,13 +12,30 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
+    - name: Install NodeJS
+      uses: actions/setup-node@v4
+      with:
+        registry-url: https://npm.pkg.github.com
+        scope: "@eveshipfit"
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set version
+      run: |
+        # Remove the "v" from the version.
+        VERSION=$(echo ${{ github.ref_name }} | cut -b2-)
+        echo "Version: ${VERSION}"
+
+        sed -i 's/"version": "0.0.0-git"/"version": "'${VERSION}'"/' package.json
 
     - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y --no-install-recommends rclone protobuf-compiler
         pip install -r requirements.txt
+        npm install
 
     - name: Setup rclone
       run: |
@@ -69,3 +86,16 @@ jobs:
         RCLONE_CONFIG_EVESHIPFIT_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
         RCLONE_CONFIG_EVESHIPFIT_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
         RCLONE_CONFIG_EVESHIPFIT_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+    # We build the pacakge after so that the scripts aren't pushed to R2, but the package
+    # we publish to npm does include the data files
+    - name: Build package
+      run: |
+        npm run build
+
+    - name: Publish package
+      uses: JS-DevTools/npm-publish@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        registry: "https://npm.pkg.github.com"
+        package: package.json
