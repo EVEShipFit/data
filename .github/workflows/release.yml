@@ -87,8 +87,7 @@ jobs:
         RCLONE_CONFIG_EVESHIPFIT_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
         RCLONE_CONFIG_EVESHIPFIT_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
 
-    # We build the pacakge after so that the scripts aren't pushed to R2, but the package
-    # we publish to npm does include the data files
+    # Build the package after pushing to R2 so that we don't push the javascript files to R2.
     - name: Build package
       run: |
         npm run build
