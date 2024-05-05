@@ -182,6 +182,7 @@ def convert_dogma_attributes(path):
     add_esf_attribute(-32, "droneBandwidthUsedTotal")
     add_esf_attribute(-33, "droneDamageAlphaHp")
     add_esf_attribute(-34, "droneDamageDps")
+    add_esf_attribute(-35, "droneCapacityUsed")
 
     with open("dist/sde/dogmaAttributes.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
