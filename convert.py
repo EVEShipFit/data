@@ -178,6 +178,10 @@ def convert_dogma_attributes(path):
     add_esf_attribute(-28, "damageWithoutReloadDps")
     add_esf_attribute(-29, "damageWithReloadDps")
     add_esf_attribute(-30, "damageAlphaHp")
+    add_esf_attribute(-31, "droneActive")
+    add_esf_attribute(-32, "droneBandwidthUsedTotal")
+    add_esf_attribute(-33, "droneDamageAlphaHp")
+    add_esf_attribute(-34, "droneDamageDps")
 
     with open("dist/sde/dogmaAttributes.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())

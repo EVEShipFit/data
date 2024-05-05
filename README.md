@@ -90,3 +90,7 @@ The EVE SDE has some quirks, that are easiest fixed in the conversion.
   - `-28`: `damageWithoutReloadDps` - the total DPS without reloading.
   - `-29`: `damageWithReloadDps` - the total DPS with reloading.
   - `-30`: `damageAlphaHp` - the damage done when all guns shoot at once.
+  - `-31`: `droneActive` - how many drones are active.
+  - `-32`: `droneBandwidthUsedTotal` - total bandwidth used by the active drones.
+  - `-33`: `droneDamageAlphaHp` - the damage done when all active drones shoot at once.
+  - `-34`: `droneDamageDps` - the total DPS for the active drones.
