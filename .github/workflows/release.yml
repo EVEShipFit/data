@@ -57,6 +57,7 @@ jobs:
       run: |
         protoc --python_out=. esf.proto
         python convert.py sde/fsd
+        python list_shiptypes.py sde/fsd
 
     - name: Fetch icons
       run: |
