@@ -94,3 +94,4 @@ The EVE SDE has some quirks, that are easiest fixed in the conversion.
   - `-32`: `droneBandwidthUsedTotal` - total bandwidth used by the active drones.
   - `-33`: `droneDamageAlphaHp` - the damage done when all active drones shoot at once.
   - `-34`: `droneDamageDps` - the total DPS for the active drones.
+ -  `-35`: `droneCapacityUsed` - total dronebay capacity used.
