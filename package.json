@@ -1,5 +1,42 @@
 {
-  "dependencies": {
-    "protobufjs-cli": "^1.1.2"
+  "name": "@eveshipfit/data",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/EVEShipFit"
+  },
+  "version": "0.0.0-git",
+  "description": "Converted data from the EVE Online SDE",
+  "scripts": {
+    "build": "rollup -c",
+    "lint": "eslint src --ext .js,.ts --cache && prettier -c src",
+    "prettier": "prettier -w src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EVEShipFit/data.git"
+  },
+  "author": "Patric Stout <eveshipfit@truebrain.nl>",
+  "license": "SEE LICENSE IN LICENSE",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.5",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.1.3",
+    "protobufjs-cli": "^1.1.2",
+    "rollup": "^4.4.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "rollup-plugin-esbuild": "^6.1.0",
+    "rollup-plugin-node-externals": "^7.0.1",
+    "typescript": "^5.2.2"
   }
 }
