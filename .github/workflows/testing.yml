@@ -26,7 +26,89 @@ jobs:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install dependencies
-      run: npm install
+      run: |
+        npm install
+        pip install black flake8
+
+    - uses: TrueBrain/actions-flake8@v2
+      with:
+        path: convert download_icons download_sde list_shiptypes
+        max_line_length: 120
 
     - name: Run linter
-      run: npm run lint
+      run: |
+        npm run lint
+        black --check -l 120 convert download_icons download_sde list_shiptypes
+
+  sde:
+    name: Fetch SDE
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install Python2
+      run: |
+        choco install python2
+        C:\Python27\python.exe -m pip install --upgrade pip
+        C:\Python27\python.exe -m pip install requests
+
+    - name: Download loaders
+      run: |
+        C:\Python27\python.exe download_sde/download_loaders.py
+
+    - name: Execute loaders
+      run: |
+        C:\Python27\python.exe download_sde/execute_loaders.py
+
+    - name: Publish artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sde
+        path: json
+
+  datafiles:
+    name: Generate datafiles
+    runs-on: ubuntu-latest
+
+    needs: [sde]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install NodeJS
+      uses: actions/setup-node@v4
+      with:
+        registry-url: https://npm.pkg.github.com
+        scope: "@eveshipfit"
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y --no-install-recommends protobuf-compiler
+        pip install -r requirements.txt
+        npm install
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: sde
+        path: sde
+
+    - name: Convert SDE YAML to Protobuf
+      run: |
+        protoc --python_out=. esf.proto
+        python -m convert sde
+        python -m list_shiptypes sde
+
+    - name: Fetch icons
+      run: |
+        python -m download_icons sde
+
+    - name: Build package
+      run: |
+        npm run build

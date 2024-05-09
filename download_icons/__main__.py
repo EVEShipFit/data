@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 import sys
@@ -17,14 +18,29 @@ folders = [
 ]
 files = {}
 
-with open(f"{path}/marketGroups.yaml") as fp:
-    marketGroups = yaml.load(fp, Loader=yaml.CSafeLoader)
+try:
+    with open(f"{path}/marketGroups.yaml") as fp:
+        marketGroups = yaml.load(fp, Loader=yaml.CSafeLoader)
+except FileNotFoundError:
+    with open(f"{path}/marketgroups.json") as fp:
+        marketGroups = json.load(fp)
+        marketGroups = {int(k): v for k, v in marketGroups.items()}
 
-with open(f"{path}/metaGroups.yaml") as fp:
-    metaGroups = yaml.load(fp, Loader=yaml.CSafeLoader)
+try:
+    with open(f"{path}/metaGroups.yaml") as fp:
+        metaGroups = yaml.load(fp, Loader=yaml.CSafeLoader)
+except FileNotFoundError:
+    with open(f"{path}/metagroups.json") as fp:
+        metaGroups = json.load(fp)
+        metaGroups = {int(k): v for k, v in metaGroups.items()}
 
-with open(f"{path}/iconIDs.yaml") as fp:
-    iconIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+try:
+    with open(f"{path}/iconIDs.yaml") as fp:
+        iconIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+except FileNotFoundError:
+    with open(f"{path}/iconids.json") as fp:
+        iconIDs = json.load(fp)
+        iconIDs = {int(k): v for k, v in iconIDs.items()}
 
 for marketGroupID, marketGroup in marketGroups.items():
     if "iconID" not in marketGroup or marketGroup["iconID"] == 0:

@@ -6,9 +6,39 @@ on:
     - published
 
 jobs:
+  sde:
+    name: Fetch SDE
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install Python2
+      run: |
+        choco install python2
+        C:\Python27\python.exe -m pip install --upgrade pip
+        C:\Python27\python.exe -m pip install requests
+
+    - name: Download loaders
+      run: |
+        C:\Python27\python.exe download_sde/download_loaders.py
+
+    - name: Execute loaders
+      run: |
+        C:\Python27\python.exe download_sde/execute_loaders.py
+
+    - name: Publish artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sde
+        path: json
+
   datafiles:
     name: Publish datafiles
     runs-on: ubuntu-latest
+
+    needs: [sde]
 
     steps:
     - name: Checkout
@@ -51,33 +81,21 @@ jobs:
         echo "application/x-protobuf pb2" | sudo tee -a /etc/mime.types
         echo "80:application/x-protobuf:*.pb2" | sudo tee -a /usr/share/mime/globs2
 
-    - name: Fetch SDE
-      run: |
-        wget -q https://eve-static-data-export.s3-eu-west-1.amazonaws.com/tranquility/sde.zip
-        unzip sde.zip
-
-    - name: Validate SDE version
-      run: |
-        SDE_VERSION=$(date -r sde.zip "+%F" | sed 's/-//g')
-        RELEASE_SDE_VERSION=$(echo ${{ github.ref_name }} | cut -d. -f3)
-
-        echo "SDK version: ${SDE_VERSION}"
-        echo "Release version: ${RELEASE_SDE_VERSION}"
-
-        if [ "${SDE_VERSION}" != "${RELEASE_SDE_VERSION}" ]; then
-          echo "SDE version mismatch: ${SDE_VERSION} != ${RELEASE_SDE_VERSION}"
-          exit 1
-        fi
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: sde
+        path: sde
 
     - name: Convert SDE YAML to Protobuf
       run: |
         protoc --python_out=. esf.proto
-        python convert.py sde/fsd
-        python list_shiptypes.py sde/fsd
+        python -m convert sde
+        python -m list_shiptypes sde
 
     - name: Fetch icons
       run: |
-        python download_icons.py sde/fsd
+        python -m download_icons sde
 
     - name: Build package
       run: |
