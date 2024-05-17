@@ -1,8 +1,11 @@
-/__pycache__/
+__pycache__/
 /.env/
+/data/
 /dist/
 /esf_pb2.js
 /esf_pb2.py
+/json/
 /node_modules/
 /package-lock.json
+/pyd/
 /sde/

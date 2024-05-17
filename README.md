@@ -23,10 +23,30 @@ Download the latest EVE SDE from [their website](https://developers.eveonline.co
 Now run the tool:
 
 ```bash
-python convert.py <path to fsd folder inside the sde>
+python -m convert <path to fsd folder inside the sde>
 ```
 
 This will take a while to generate the protobuf files, but they will be outputed in the `dist` folder.
+
+### SDE based on EVE client information
+
+The convert script also supports loading the information from data taken from the latest EVE client.
+In general, this is more up-to-date than the published SDE.
+The downside is, that it requires Python2 on Windows in order to extract.
+
+How it works:
+- It downloads several `.pyd` files (which are actually DLLs, so this only works on Windows) from the installer.
+- It downloads `.fsdbinary` files from the installer.
+- It loads the `.pyd` files in a Python2 context. These files contain information how to load the `.fsdbinary` files.
+- It exports the result as `.json` files in the `json/` folder.
+
+Use the `download_sde/download_loaders.py` to download the files, and `download_sde/execute_loaders.py` to convert them to JSON.
+
+Now convert them with:
+
+```bash
+python -m convert <path to json>
+```
 
 ## Patches
 

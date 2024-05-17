@@ -1,8 +1,11 @@
+import json
 import os
 import sys
 import yaml
 
 import esf_pb2
+
+from google.protobuf.json_format import MessageToJson
 
 if len(sys.argv) < 2:
     print("Usage: python3 convert.py <path/to/eve-sde/fsd>")
@@ -11,13 +14,19 @@ if len(sys.argv) < 2:
 path = sys.argv[1]
 
 os.makedirs("dist/sde", exist_ok=True)
+os.makedirs("dist/sde_json", exist_ok=True)
 
 
 def convert_type_dogma(path, ships):
     print("Converting typeDogma ...")
 
-    with open(f"{path}/typeDogma.yaml") as fp:
-        typeDogma = yaml.load(fp, Loader=yaml.CSafeLoader)
+    try:
+        with open(f"{path}/typeDogma.yaml") as fp:
+            typeDogma = yaml.load(fp, Loader=yaml.CSafeLoader)
+    except FileNotFoundError:
+        with open(f"{path}/typedogma.json") as fp:
+            typeDogma = json.load(fp)
+            typeDogma = {int(k): v for k, v in typeDogma.items()}
 
     pb2 = esf_pb2.TypeDogma()
 
@@ -45,21 +54,34 @@ def convert_type_dogma(path, ships):
     with open("dist/sde/typeDogma.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
+    with open("dist/sde_json/typeDogma.json", "w") as fp:
+        fp.write(MessageToJson(pb2, sort_keys=True))
+
 
 def convert_type_ids(path):
     print("Converting typeIDs ...")
 
-    with open(f"{path}/groupIDs.yaml") as fp:
-        groupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+    try:
+        with open(f"{path}/groupIDs.yaml") as fp:
+            groupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+    except FileNotFoundError:
+        with open(f"{path}/groups.json") as fp:
+            groupIDs = json.load(fp)
+            groupIDs = {int(k): v for k, v in groupIDs.items()}
 
-    with open(f"{path}/typeIDs.yaml") as fp:
-        typeIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+    try:
+        with open(f"{path}/typeIDs.yaml") as fp:
+            typeIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+    except FileNotFoundError:
+        with open(f"{path}/types.json") as fp:
+            typeIDs = json.load(fp)
+            typeIDs = {int(k): v for k, v in typeIDs.items()}
 
     pb2 = esf_pb2.TypeIDs()
     ships = []
 
     for id, entry in typeIDs.items():
-        pb2.entries[id].name = entry["name"]["en"]
+        pb2.entries[id].name = entry["name"]["en"] if "name" in entry else entry["typeNameID"]
         pb2.entries[id].groupID = entry["groupID"]
         pb2.entries[id].categoryID = groupIDs[entry["groupID"]]["categoryID"]
         pb2.entries[id].published = entry["published"]
@@ -73,17 +95,20 @@ def convert_type_ids(path):
             pb2.entries[id].marketGroupID = entry["marketGroupID"]
         if "metaGroupID" in entry:
             pb2.entries[id].metaGroupID = entry["metaGroupID"]
-        if "capacity" in entry:
+        if "capacity" in entry and entry["capacity"] != 0.0:
             pb2.entries[id].capacity = entry["capacity"]
-        if "mass" in entry:
+        if "mass" in entry and entry["mass"] != 0.0:
             pb2.entries[id].mass = entry["mass"]
-        if "radius" in entry:
+        if "radius" in entry and entry["radius"] != 1.0:
             pb2.entries[id].radius = entry["radius"]
-        if "volume" in entry:
+        if "volume" in entry and entry["volume"] != 0.0:
             pb2.entries[id].volume = entry["volume"]
 
     with open("dist/sde/typeIDs.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
+
+    with open("dist/sde_json/typeIDs.json", "w") as fp:
+        fp.write(MessageToJson(pb2, sort_keys=True))
 
     return ships
 
@@ -91,30 +116,43 @@ def convert_type_ids(path):
 def convert_group_ids(path):
     print("Converting groupIDs ...")
 
-    with open(f"{path}/groupIDs.yaml") as fp:
-        groupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+    try:
+        with open(f"{path}/groupIDs.yaml") as fp:
+            groupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+    except FileNotFoundError:
+        with open(f"{path}/groups.json") as fp:
+            groupIDs = json.load(fp)
+            groupIDs = {int(k): v for k, v in groupIDs.items()}
 
     pb2 = esf_pb2.GroupIDs()
 
     for id, entry in groupIDs.items():
-        pb2.entries[id].name = entry["name"]["en"]
+        pb2.entries[id].name = entry["name"]["en"] if "name" in entry else entry["groupNameID"]
         pb2.entries[id].categoryID = entry["categoryID"]
         pb2.entries[id].published = entry["published"]
 
     with open("dist/sde/groupIDs.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
+    with open("dist/sde_json/groupIDs.json", "w") as fp:
+        fp.write(MessageToJson(pb2, sort_keys=True))
+
 
 def convert_market_groups(path):
     print("Converting marketGroups ...")
 
-    with open(f"{path}/marketGroups.yaml") as fp:
-        marketGroupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+    try:
+        with open(f"{path}/marketGroups.yaml") as fp:
+            marketGroupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+    except FileNotFoundError:
+        with open(f"{path}/marketgroups.json") as fp:
+            marketGroupIDs = json.load(fp)
+            marketGroupIDs = {int(k): v for k, v in marketGroupIDs.items()}
 
     pb2 = esf_pb2.MarketGroups()
 
     for id, entry in marketGroupIDs.items():
-        pb2.entries[id].name = entry["nameID"]["en"]
+        pb2.entries[id].name = entry["nameID"] if isinstance(entry["nameID"], str) else entry["nameID"]["en"]
 
         if "parentGroupID" in entry:
             pb2.entries[id].parentGroupID = entry["parentGroupID"]
@@ -124,12 +162,20 @@ def convert_market_groups(path):
     with open("dist/sde/marketGroups.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
+    with open("dist/sde_json/marketGroups.json", "w") as fp:
+        fp.write(MessageToJson(pb2, sort_keys=True))
+
 
 def convert_dogma_attributes(path):
     print("Converting dogmaAttributes ...")
 
-    with open(f"{path}/dogmaAttributes.yaml") as fp:
-        dogmaAttributes = yaml.load(fp, Loader=yaml.CSafeLoader)
+    try:
+        with open(f"{path}/dogmaAttributes.yaml") as fp:
+            dogmaAttributes = yaml.load(fp, Loader=yaml.CSafeLoader)
+    except FileNotFoundError:
+        with open(f"{path}/dogmaattributes.json") as fp:
+            dogmaAttributes = json.load(fp)
+            dogmaAttributes = {int(k): v for k, v in dogmaAttributes.items()}
 
     pb2 = esf_pb2.DogmaAttributes()
 
@@ -187,12 +233,20 @@ def convert_dogma_attributes(path):
     with open("dist/sde/dogmaAttributes.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
+    with open("dist/sde_json/dogmaAttributes.json", "w") as fp:
+        fp.write(MessageToJson(pb2, sort_keys=True))
+
 
 def convert_dogma_effects(path):
     print("Converting dogmaEffects ...")
 
-    with open(f"{path}/dogmaEffects.yaml") as fp:
-        dogmaEffects = yaml.load(fp, Loader=yaml.CSafeLoader)
+    try:
+        with open(f"{path}/dogmaEffects.yaml") as fp:
+            dogmaEffects = yaml.load(fp, Loader=yaml.CSafeLoader)
+    except FileNotFoundError:
+        with open(f"{path}/dogmaeffects.json") as fp:
+            dogmaEffects = json.load(fp)
+            dogmaEffects = {int(k): v for k, v in dogmaEffects.items()}
 
     pb2 = esf_pb2.DogmaEffects()
     pbmi = pb2.DogmaEffect.ModifierInfo()
@@ -337,7 +391,8 @@ def convert_dogma_effects(path):
         if entry["effectName"] == "moduleBonusAfterburner" or entry["effectName"] == "moduleBonusMicrowarpdrive":
             add_modifier(id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, 4, 2, 796)  # mass <modAdd> massAddition
 
-            # Velocity change is calculated like this: velocityBoost = item.speedFactor * item.speedBoostFactor / ship.mass
+            # Velocity change is calculated like this:
+            #   velocityBoost = item.speedFactor * item.speedBoostFactor / ship.mass
             # First, calculate the multiplication on the item.
             add_modifier(
                 id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, -7, -1, 567
@@ -346,7 +401,8 @@ def convert_dogma_effects(path):
                 id, pbmi.Domain.shipID, pbmi.Func.ItemModifier, -7, 4, 20
             )  # velocityBoost <postMul> speedFactor
 
-            # Next, "applyVelocityBoost" is applied on all ships which takes care of the final calculation (as mass is an attribute of the ship).
+            # Next, "applyVelocityBoost" is applied on all ships which takes care of
+            # the final calculation (as mass is an attribute of the ship).
 
         # missileEMDmgBonus, missileExplosiveDmgBonus, missileKineticDmgBonus, missileThermalDmgBonus don't apply
         # any effect direct, but this is handled internally in EVE. For us,
@@ -378,6 +434,9 @@ def convert_dogma_effects(path):
 
     with open("dist/sde/dogmaEffects.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
+
+    with open("dist/sde_json/dogmaEffects.json", "w") as fp:
+        fp.write(MessageToJson(pb2, sort_keys=True))
 
 
 convert_group_ids(path)
