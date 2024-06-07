@@ -23,7 +23,7 @@ os.makedirs("data")
 session = requests.Session()
 
 # Find the latest installer listing.
-if ref_name and ref_name.endswith("-sisi"):
+if ref_name and ref_name.endswith("+sisi"):
     print("Downloading Singularity data")
     latest = session.get("https://binaries.eveonline.com/eveclient_SISI.json").json()
 else:
