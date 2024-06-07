@@ -22,7 +22,7 @@ jobs:
 
     - name: Download loaders
       run: |
-        C:\Python27\python.exe download_sde/download_loaders.py
+        C:\Python27\python.exe download_sde/download_loaders.py ${{ github.ref_name }}
 
     - name: Execute loaders
       run: |
