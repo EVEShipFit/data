@@ -1,5 +1,6 @@
 import os
 import requests
+import sys
 
 # Only download these loaders and their data.
 LOADER_LIST = [
@@ -14,13 +15,20 @@ LOADER_LIST = [
     "types",
 ]
 
+ref_name = None if len(sys.argv) == 1 else sys.argv[1]
+
 os.makedirs("pyd")
 os.makedirs("data")
 
 session = requests.Session()
 
 # Find the latest installer listing.
-latest = session.get("https://binaries.eveonline.com/eveclient_TQ.json").json()
+if ref_name and ref_name.endswith("-sisi"):
+    print("Downloading Singularity data")
+    latest = session.get("https://binaries.eveonline.com/eveclient_SISI.json").json()
+else:
+    print("Downloading Tranquility data")
+    latest = session.get("https://binaries.eveonline.com/eveclient_TQ.json").json()
 build = latest["build"]
 installer = session.get("https://binaries.eveonline.com/eveonline_" + build + ".txt").text
 
