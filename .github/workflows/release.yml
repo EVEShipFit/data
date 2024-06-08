@@ -92,6 +92,7 @@ jobs:
         protoc --python_out=. esf.proto
         python -m convert sde
         python -m list_shiptypes sde
+        rm -rf sde_json
 
     - name: Fetch icons
       run: |
