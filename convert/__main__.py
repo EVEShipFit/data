@@ -58,35 +58,35 @@ def convert_type_dogma(path, ships):
         fp.write(MessageToJson(pb2, sort_keys=True))
 
 
-def convert_type_ids(path):
-    print("Converting typeIDs ...")
+def convert_types(path):
+    print("Converting types ...")
 
     try:
-        with open(f"{path}/groupIDs.yaml") as fp:
-            groupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+        with open(f"{path}/groups.yaml") as fp:
+            groups = yaml.load(fp, Loader=yaml.CSafeLoader)
     except FileNotFoundError:
         with open(f"{path}/groups.json") as fp:
-            groupIDs = json.load(fp)
-            groupIDs = {int(k): v for k, v in groupIDs.items()}
+            groups = json.load(fp)
+            groups = {int(k): v for k, v in groups.items()}
 
     try:
-        with open(f"{path}/typeIDs.yaml") as fp:
-            typeIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+        with open(f"{path}/types.yaml") as fp:
+            types = yaml.load(fp, Loader=yaml.CSafeLoader)
     except FileNotFoundError:
         with open(f"{path}/types.json") as fp:
-            typeIDs = json.load(fp)
-            typeIDs = {int(k): v for k, v in typeIDs.items()}
+            types = json.load(fp)
+            types = {int(k): v for k, v in types.items()}
 
-    pb2 = esf_pb2.TypeIDs()
+    pb2 = esf_pb2.Types()
     ships = []
 
-    for id, entry in typeIDs.items():
+    for id, entry in types.items():
         pb2.entries[id].name = entry["name"]["en"] if "name" in entry else entry["typeNameID"]
         pb2.entries[id].groupID = entry["groupID"]
-        pb2.entries[id].categoryID = groupIDs[entry["groupID"]]["categoryID"]
+        pb2.entries[id].categoryID = groups[entry["groupID"]]["categoryID"]
         pb2.entries[id].published = entry["published"]
 
-        if groupIDs[entry["groupID"]]["categoryID"] == 6:
+        if groups[entry["groupID"]]["categoryID"] == 6:
             ships.append(id)
 
         if "factionID" in entry:
@@ -104,37 +104,37 @@ def convert_type_ids(path):
         if "volume" in entry and entry["volume"] != 0.0:
             pb2.entries[id].volume = entry["volume"]
 
-    with open("dist/sde/typeIDs.pb2", "wb") as fp:
+    with open("dist/sde/types.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
-    with open("dist/sde_json/typeIDs.json", "w") as fp:
+    with open("dist/sde_json/types.json", "w") as fp:
         fp.write(MessageToJson(pb2, sort_keys=True))
 
     return ships
 
 
-def convert_group_ids(path):
-    print("Converting groupIDs ...")
+def convert_groups(path):
+    print("Converting groups ...")
 
     try:
-        with open(f"{path}/groupIDs.yaml") as fp:
-            groupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+        with open(f"{path}/groups.yaml") as fp:
+            groups = yaml.load(fp, Loader=yaml.CSafeLoader)
     except FileNotFoundError:
         with open(f"{path}/groups.json") as fp:
-            groupIDs = json.load(fp)
-            groupIDs = {int(k): v for k, v in groupIDs.items()}
+            groups = json.load(fp)
+            groups = {int(k): v for k, v in groups.items()}
 
-    pb2 = esf_pb2.GroupIDs()
+    pb2 = esf_pb2.Groups()
 
-    for id, entry in groupIDs.items():
+    for id, entry in groups.items():
         pb2.entries[id].name = entry["name"]["en"] if "name" in entry else entry["groupNameID"]
         pb2.entries[id].categoryID = entry["categoryID"]
         pb2.entries[id].published = entry["published"]
 
-    with open("dist/sde/groupIDs.pb2", "wb") as fp:
+    with open("dist/sde/groups.pb2", "wb") as fp:
         fp.write(pb2.SerializeToString())
 
-    with open("dist/sde_json/groupIDs.json", "w") as fp:
+    with open("dist/sde_json/groups.json", "w") as fp:
         fp.write(MessageToJson(pb2, sort_keys=True))
 
 
@@ -143,15 +143,15 @@ def convert_market_groups(path):
 
     try:
         with open(f"{path}/marketGroups.yaml") as fp:
-            marketGroupIDs = yaml.load(fp, Loader=yaml.CSafeLoader)
+            marketGroups = yaml.load(fp, Loader=yaml.CSafeLoader)
     except FileNotFoundError:
         with open(f"{path}/marketgroups.json") as fp:
-            marketGroupIDs = json.load(fp)
-            marketGroupIDs = {int(k): v for k, v in marketGroupIDs.items()}
+            marketGroups = json.load(fp)
+            marketGroups = {int(k): v for k, v in marketGroups.items()}
 
     pb2 = esf_pb2.MarketGroups()
 
-    for id, entry in marketGroupIDs.items():
+    for id, entry in marketGroups.items():
         pb2.entries[id].name = entry["nameID"] if isinstance(entry["nameID"], str) else entry["nameID"]["en"]
 
         if "parentGroupID" in entry:
@@ -439,9 +439,9 @@ def convert_dogma_effects(path):
         fp.write(MessageToJson(pb2, sort_keys=True))
 
 
-convert_group_ids(path)
+convert_groups(path)
 convert_market_groups(path)
-ships = convert_type_ids(path)
+ships = convert_types(path)
 convert_type_dogma(path, ships)
 convert_dogma_attributes(path)
 convert_dogma_effects(path)

@@ -21,8 +21,8 @@ message TypeDogma {
     map<int32, TypeDogmaEntry> entries = 1;
 }
 
-message TypeIDs {
-    message TypeID {
+message Types {
+    message Type {
         required string name = 1;
         required int32 groupID = 2;
         required int32 categoryID = 3;
@@ -37,17 +37,17 @@ message TypeIDs {
         optional float volume = 11;
     }
 
-    map<int32, TypeID> entries = 1;
+    map<int32, Type> entries = 1;
 }
 
-message GroupIDs {
-    message GroupID {
+message Groups {
+    message Group {
         required string name = 1;
         required int32 categoryID = 2;
         required bool published = 3;
     }
 
-    map<int32, GroupID> entries = 1;
+    map<int32, Group> entries = 1;
 }
 
 message MarketGroups {
