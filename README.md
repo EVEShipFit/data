@@ -18,12 +18,12 @@ npx pbjs -t static-module -w es6 -o esf_pb2.js esf.proto --no-create --no-encode
 
 ## Converting
 
-Download the latest EVE SDE from [their website](https://developers.eveonline.com/resource/resources).
+Download the latest EVE FSD from [their website](https://developers.eveonline.com/resource/resources).
 
 Now run the tool:
 
 ```bash
-python -m convert <path to fsd folder inside the sde>
+python -m convert <path to fsd folder>
 ```
 
 This will take a while to generate the protobuf files, but they will be outputed in the `dist` folder.
