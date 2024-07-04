@@ -32,13 +32,13 @@ jobs:
 
     - uses: TrueBrain/actions-flake8@v2
       with:
-        path: convert download_icons download_sde list_shiptypes
+        path: convert download_icons download_sde
         max_line_length: 120
 
     - name: Run linter
       run: |
         npm run lint
-        black --check -l 120 convert download_icons download_sde list_shiptypes
+        black --check -l 120 convert download_icons download_sde
 
   sde:
     name: Fetch SDE
@@ -103,7 +103,6 @@ jobs:
       run: |
         protoc --python_out=. esf.proto
         python -m convert sde
-        python -m list_shiptypes sde
 
     - name: Fetch icons
       run: |
