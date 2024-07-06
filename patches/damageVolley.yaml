@@ -1,0 +1,150 @@
+description: |
+  Patch in an attribute to indicate the damage a single volley of a module
+  will do.
+
+attributes:
+- new:
+    name: damageVolley
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: damageVolleyAmmo
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: otherID
+    func: ItemModifier
+    modifiedAttribute: damageVolley
+    modifyingAttribute: emDamage
+    operation: modAdd
+  - domain: otherID
+    func: ItemModifier
+    modifiedAttribute: damageVolley
+    modifyingAttribute: explosiveDamage
+    operation: modAdd
+  - domain: otherID
+    func: ItemModifier
+    modifiedAttribute: damageVolley
+    modifyingAttribute: kineticDamage
+    operation: modAdd
+  - domain: otherID
+    func: ItemModifier
+    modifiedAttribute: damageVolley
+    modifyingAttribute: thermalDamage
+    operation: modAdd
+
+- new:
+    name: damageVolley
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damageVolley
+    modifyingAttribute: emDamage
+    operation: modAdd
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damageVolley
+    modifyingAttribute: explosiveDamage
+    operation: modAdd
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damageVolley
+    modifyingAttribute: kineticDamage
+    operation: modAdd
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damageVolley
+    modifyingAttribute: thermalDamage
+    operation: modAdd
+
+- new:
+    name: damageVolleyMultiplier
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damageVolley
+    modifyingAttribute: damageMultiplier
+    operation: postMul
+
+typeDogma:
+- patch:
+  - category: Charge
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  dogmaEffects:
+  - effect: damageVolleyAmmo
+    isDefault: false
+
+- patch:
+  - category: Module
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  - category: Module
+    hasAnyEffects:
+    - name: useMissiles
+    - name: turretFitted
+  - category: Drone
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  dogmaEffects:
+  - effect: damageVolley
+    isDefault: false
+
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: damageMultiplier
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  - category: Module
+    hasAllAttributes:
+    - name: damageMultiplier
+    hasAnyEffects:
+    - name: useMissiles
+    - name: turretFitted
+  - category: Drone
+    hasAllAttributes:
+    - name: damageMultiplier
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  dogmaEffects:
+  - effect: damageVolleyMultiplier
+    isDefault: false

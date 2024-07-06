@@ -1,0 +1,34 @@
+description: |
+  Patch in an attribute to indicate the capacity of drones.
+
+attributes:
+- new:
+    name: droneCapacityLoad
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: droneLoad
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: droneCapacityLoad
+    modifyingAttribute: volume
+    operation: modAdd
+
+typeDogma:
+- patch:
+  - category: Drone
+  dogmaEffects:
+  - effect: droneLoad
+    isDefault: false

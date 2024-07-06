@@ -1,0 +1,89 @@
+description: |
+  This patch introduces attributes to calculate the armor repair rate.
+
+  It calculates this for both modules that influence the armor repair rate,
+  and for the ship that receives the armor repair rate.
+
+attributes:
+- new:
+    name: armorRepairRate
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: armorEffectiveRepairRate
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: armorRepairRate
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorRepairRate
+    modifyingAttribute: thousand
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorRepairRate
+    modifyingAttribute: armorDamageAmount
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorRepairRate
+    modifyingAttribute: duration
+    operation: postDiv
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: armorRepairRate
+    modifyingAttribute: armorRepairRate
+    operation: modAdd
+
+- new:
+    name: armorEffectiveRepairRate
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorEffectiveRepairRate
+    modifyingAttribute: armorRepairRate
+    operation: modAdd
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorEffectiveRepairRate
+    modifyingAttribute: armorDamageEffectiveResonance
+    operation: postDiv
+
+typeDogma:
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: armorDamageAmount
+    - name: duration
+    hasAnyEffects:
+    - name: armorRepair
+  dogmaEffects:
+  - effect: armorRepairRate
+    isDefault: false
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: armorEffectiveRepairRate
+    isDefault: false

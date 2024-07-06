@@ -1,0 +1,88 @@
+description: |
+  CPU / PowerGrid load is not calculated by dogma data.
+
+  This patch extends the dogma data with both attributes and effects to do
+  this calculation.
+
+  It reuses the existing "cpuLoad" and "powerLoad", as looking at their ID,
+  it is most likely the attribute that was meant to represent the used CPU
+  and PowerGrid.
+  "cpuFree" and "powerFree" show how much CPU and PowerGrid is still available.
+
+attributes:
+- new:
+    name: cpuFree
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: powerFree
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: cpuPowerLoad
+  effectCategory: online
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: cpuLoad
+    modifyingAttribute: cpu
+    operation: modAdd
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: powerLoad
+    modifyingAttribute: power
+    operation: modAdd
+- new:
+    name: cpuPowerFree
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: cpuFree
+    modifyingAttribute: cpuOutput
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: cpuFree
+    modifyingAttribute: cpuLoad
+    operation: modSub
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: powerFree
+    modifyingAttribute: powerOutput
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: powerFree
+    modifyingAttribute: powerLoad
+    operation: modSub
+
+typeDogma:
+- patch:
+  - category: Module
+  dogmaEffects:
+  - effect: cpuPowerLoad
+    isDefault: false
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: cpuPowerFree
+    isDefault: false

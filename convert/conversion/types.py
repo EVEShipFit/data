@@ -6,36 +6,33 @@ import esf_pb2
 from google.protobuf.json_format import MessageToJson
 
 
-def convert(path):
-    print("Converting types ...")
-
-    try:
-        with open(f"{path}/groups.yaml") as fp:
-            groups = yaml.load(fp, Loader=yaml.CSafeLoader)
-    except FileNotFoundError:
-        with open(f"{path}/groups.json") as fp:
-            groups = json.load(fp)
-            groups = {int(k): v for k, v in groups.items()}
+def convert(path, data):
+    print("Loading types ...")
 
     try:
         with open(f"{path}/types.yaml") as fp:
             types = yaml.load(fp, Loader=yaml.CSafeLoader)
+            for type in types.values():
+                type["name"] = type["name"]["en"]
     except FileNotFoundError:
         with open(f"{path}/types.json") as fp:
             types = json.load(fp)
             types = {int(k): v for k, v in types.items()}
+            for type in types.values():
+                type["name"] = type["typeNameID"]
+
+    data["types"] = types
+    yield
+
+    print("Converting types ...")
 
     pb2 = esf_pb2.Types()
-    ships = []
 
     for id, entry in types.items():
-        pb2.entries[id].name = entry["name"]["en"] if "name" in entry else entry["typeNameID"]
+        pb2.entries[id].name = entry["name"]
         pb2.entries[id].groupID = entry["groupID"]
-        pb2.entries[id].categoryID = groups[entry["groupID"]]["categoryID"]
+        pb2.entries[id].categoryID = data["groups"][entry["groupID"]]["categoryID"]
         pb2.entries[id].published = entry["published"]
-
-        if groups[entry["groupID"]]["categoryID"] == 6:
-            ships.append(id)
 
         if "factionID" in entry:
             pb2.entries[id].factionID = entry["factionID"]
@@ -57,5 +54,3 @@ def convert(path):
 
     with open("dist/sde_json/types.json", "w") as fp:
         fp.write(MessageToJson(pb2, sort_keys=True))
-
-    return ships

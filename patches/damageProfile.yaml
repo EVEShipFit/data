@@ -1,0 +1,35 @@
+description: |
+  To calculate incoming damage, it is important to assume a type of damage you
+  will be receiving.
+
+  By default it is uniform: equal damage on all four resistances. But with
+  these attributes you can set the damage profile to be more specific.
+
+  NOTE: The total of these values should always be exactly one. If not, the
+  effective hitpoints will be incorrect.
+
+attributes:
+- new:
+    name: damageProfileEm
+  published: true
+  defaultValue: 0.25
+  highIsGood: true
+  stackable: true
+- new:
+    name: damageProfileExplosive
+  published: true
+  defaultValue: 0.25
+  highIsGood: true
+  stackable: true
+- new:
+    name: damageProfileKinetic
+  published: true
+  defaultValue: 0.25
+  highIsGood: true
+  stackable: true
+- new:
+    name: damageProfileThermal
+  published: true
+  defaultValue: 0.25
+  highIsGood: true
+  stackable: true

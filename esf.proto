@@ -40,6 +40,15 @@ message Types {
     map<int32, Type> entries = 1;
 }
 
+message Categories {
+    message Category {
+        required string name = 1;
+        required bool published = 2;
+    }
+
+    map<int32, Category> entries = 1;
+}
+
 message Groups {
     message Group {
         required string name = 1;

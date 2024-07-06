@@ -1,0 +1,140 @@
+description: |
+  Shield, armor, and hull are presented as Hitpoints by the dogma. However, a
+  more realistic value to show the user is Effective Hitpoints, which takes
+  resistance into account.
+
+  This patch creates a few new attributes to calculate the effective hitpoints
+  of armor. There are two similar patch-files that do this for the other two.
+
+attributes:
+- new:
+    name: armorEmDamageEffectiveResonance
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: armorExplosiveDamageEffectiveResonance
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: armorKineticDamageEffectiveResonance
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: armorThermalDamageEffectiveResonance
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+- new:
+    name: armorDamageEffectiveResonance
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+- new:
+    name: armorEhp
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: armorEhp
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorEmDamageEffectiveResonance
+    modifyingAttribute: damageProfileEm
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorEmDamageEffectiveResonance
+    modifyingAttribute: armorEmDamageResonance
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorDamageEffectiveResonance
+    modifyingAttribute: armorEmDamageEffectiveResonance
+    operation: modAdd
+
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorExplosiveDamageEffectiveResonance
+    modifyingAttribute: damageProfileExplosive
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorExplosiveDamageEffectiveResonance
+    modifyingAttribute: armorExplosiveDamageResonance
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorDamageEffectiveResonance
+    modifyingAttribute: armorExplosiveDamageEffectiveResonance
+    operation: modAdd
+
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorKineticDamageEffectiveResonance
+    modifyingAttribute: damageProfileKinetic
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorKineticDamageEffectiveResonance
+    modifyingAttribute: armorKineticDamageResonance
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorDamageEffectiveResonance
+    modifyingAttribute: armorKineticDamageEffectiveResonance
+    operation: modAdd
+
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorThermalDamageEffectiveResonance
+    modifyingAttribute: damageProfileThermal
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorThermalDamageEffectiveResonance
+    modifyingAttribute: armorThermalDamageResonance
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorDamageEffectiveResonance
+    modifyingAttribute: armorThermalDamageEffectiveResonance
+    operation: modAdd
+
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorEhp
+    modifyingAttribute: armorHP
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: armorEhp
+    modifyingAttribute: armorDamageEffectiveResonance
+    operation: postDiv
+
+typeDogma:
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: armorEhp
+    isDefault: false

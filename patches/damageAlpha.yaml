@@ -1,0 +1,44 @@
+description: |
+  Patch in an attribute to indicate the damage of an alpha strike. This is
+  when all guns fire all at once.
+
+attributes:
+- new:
+    name: damageAlpha
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: damageAlpha
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: damageAlpha
+    modifyingAttribute: damageVolley
+    operation: modAdd
+
+typeDogma:
+- patch:
+  - category: Module
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  - category: Module
+    hasAnyEffects:
+    - name: useMissiles
+    - name: turretFitted
+  dogmaEffects:
+  - effect: damageAlpha
+    isDefault: false

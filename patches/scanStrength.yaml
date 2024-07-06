@@ -1,0 +1,55 @@
+description: |
+  Statistics show a single scan strength, which, depending on the race of the
+  ship, uses any of the four racial scan strength attributes.
+
+  However, this is often a bit annoying to do, GUI-wise. This patch introduces
+  a single ScanStrength attribute, which is the combination of the other four.
+
+  NOTE: normally three out of the four are zero.
+
+attributes:
+- new:
+    name: scanStrength
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: scanStrength
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: scanStrength
+    modifyingAttribute: scanRadarStrength
+    operation: modAdd
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: scanStrength
+    modifyingAttribute: scanLadarStrength
+    operation: modAdd
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: scanStrength
+    modifyingAttribute: scanMagnetometricStrength
+    operation: modAdd
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: scanStrength
+    modifyingAttribute: scanGravimetricStrength
+    operation: modAdd
+
+typeDogma:
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: scanStrength
+    isDefault: false

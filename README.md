@@ -50,68 +50,33 @@ python -m convert <path to json>
 
 ## Patches
 
-The EVE SDE has some quirks, that are easiest fixed in the conversion.
+To process data easier, and keep data small, a few things are changed in the Protobuf variant of the SDE:
 
-- TypeID entries are matched to a GroupID, which is matched to a Category.
+- Type entries are matched to a GroupID, which is matched to a Category.
   This makes finding all types of a certain category (like: all skills) time consuming.
-  As such, `CategoryID` is added to every TypeID entry, which is the same as the category of the group it is in.
-- The effect `online` is in the category `active` (for internal EVE reasons).
-  But this confuses the `dogma-engine` in calculating the possible states a module can have.
-  As such, the category is changed to `online`.
+  As such, `CategoryID` is added to every Type entry, which is the same as the category of the group it is in.
 - `domain` and `func` are strings, which is slow to process.
   As those fields are actually enums, they are changed into an integer.
   Oddly enough, `operation` is already an integer (and is an enum too).
-- Afterburners and Microwarpdrive have no active effect modifier in the SDE (as they are handled specially internally in EVE).
-  To address this, the `moduleBonusAfterburner` and `moduleBonusMicrowarpdrive` get assigned extra modifiers:
-  - A modifier with the operation `add`, with on the left side `massAddition` of the item and on the right side `mass` of the ship.
-  - A modifier with the operation `postPercent`, with on the left side `signatureRadiusBonus` of the item and on the right side `signatureRadius` of the ship.
-  - A few complicated modifier to change the `maxVelocity`.
-    In normal math terms: `maxVelocity *= item.speedFactor * item.speedBoostFactor / ship.mass`.
-    The issue is that this combines attributes from the item and ship, which is normally never done like this.
-    As a solution, two things are changed:
-    - Two modifiers are added which result attribute `-7` on the ship to be the `item.speedFactor * item.speedBoostFactor` part.
-    - A new effect (`-1`: `applyVelocityBoost`) is added to all ships, which add two modifiers to do the rest: `/ ship.mass` and applying as `postPercent` to `maxVelocity`.
-- Some Missile skills have no active effect modifier in the SDE (as they are handled specially internally in EVE).
-  To address this, for these skill, an extra effect is applied.
-  The function `OwnerRequiredSkillModifier` with a SkillID of `-1` is used to indicate the effect should be applied based on the current skill.
-  Similar, `selfRof` and `droneDmgBonus` have no effects applied.
-  These are changed in a similar way.
-- Some missile attributes are applied to CharID, and not to the charge.
-  The new effect (`-2`: `applyMissileDamage`) is added to the character, which applies `missileDamageMultiplier` to all four damage types on all charges that need `Missile Launcher Operation` skill.
-- A few attributes are added to every hull, which are calculated by the `dogma-engine`.
-  They carry negative IDs, to make it more visible they are calculated by the `dogma-engine`, and are not part of the EVE SDE.
-  - `-1`: `alignTime` - seconds needed to align for warp.
-  - `-2`: `scanStrength` - there are four types of scan-strengths; this is given the highest value of those four.
-  - `-3`: `cpuUsed` - how much CPU is in use.
-  - `-4`: `powerUsed` - how much Power Grid is in use.
-  - `-5`: `cpuUnused` - how much CPU is left unused.
-  - `-6`: `powerUnused` - how much Power Grid is left unused.
-  - `-7`: `velocityBoost` - how much (in percent) the velocity will be boosted (for AB / MWD calculations).
-  - `-8`: `shieldEhpMultiplier` - multiplier to convert shield HP to shield eHP.
-  - `-9`: `armorEhpMultiplier` - multiplier to convert armor HP to armor eHP.
-  - `-10`: `hullEhpMultiplier` - multiplier to convert hull HP to hull eHP.
-  - `-11`: `shieldEhp` - shield eHP.
-  - `-12`: `armorEhp` - armor eHP.
-  - `-13`: `hullEhp` - hull eHP.
-  - `-14`: `ehp` - total (shield + armor + hull) eHP.
-  - `-15`: `passiveShieldRecharge` - passive shield recharge (in HP/s).
-  - `-16`: `shieldBoostRate` - shield boost rate (in HP/s).
-  - `-17`: `armorRepairRate` - armor repair rate (in HP/s).
-  - `-18`: `hullRepairRate` - hull repair rate (in HP/s).
-  - `-19`: `passiveShieldRechargeEhp` - passive shield recharge (in eHP/s).
-  - `-20`: `shieldBoostRateEhp` - shield boost rate (in eHP/s).
-  - `-21`: `armorRepairRateEhp` - armor repair rate (in eHP/s).
-  - `-22`: `hullRepairRateEhp` - hull repair rate (in eHP/s).
-  - `-23`: `capacitorPeakRecharge` - peak recharge of capacitor (in GJ/s).
-  - `-24`: `capacitorPeakUsage` - peak usage of capacitor (in GJ/s), when all modules would activate at the same time.
-  - `-25`: `capacitorPeakDelta` - delta between peak recharge and usage (in GJ/s).
-  - `-26`: `capacitorPeakDeltaPercentage` - delta between peak recharge and usage in percentage against peak recharge.
-  - `-27`: `capacitorDepletesIn` - if capacitor is unstable, amount of seconds till the capacitor is drained.
-  - `-28`: `damageWithoutReloadDps` - the total DPS without reloading.
-  - `-29`: `damageWithReloadDps` - the total DPS with reloading.
-  - `-30`: `damageAlphaHp` - the damage done when all guns shoot at once.
-  - `-31`: `droneActive` - how many drones are active.
-  - `-32`: `droneBandwidthUsedTotal` - total bandwidth used by the active drones.
-  - `-33`: `droneDamageAlphaHp` - the damage done when all active drones shoot at once.
-  - `-34`: `droneDamageDps` - the total DPS for the active drones.
- -  `-35`: `droneCapacityUsed` - total dronebay capacity used.
+
+Additionally, the EVE data has some quirks, and the EVE client tends to do some things internally.
+Fixing up these things in the dogma-engine makes for a rather complicated flow, which is hard to maintain.
+
+Instead, in the [patches](./patches/) folder there are several patches which are applied on top of the SDE, to mostly fix up these quirks and internal calculations.
+These patches are all documented individually.
+
+Although some patches fix quirks, most of them simply ensure that all clients of the dogma-engine use the same definition of the same word.
+As example, calculating the `shieldBoostRate` without any of these patches is not complicated, but requires knowledge of how that value comes to be.
+By pushing this into the dogma data, it means that all clients can just use `shieldBoostRate`, and all see the same value.
+The complicated part of how it is built-up is already done.
+One could argue that this is mis-using the dogma data and dogma-engine, but it cannot be denied it is an effective way to get the job done.
+
+As the dogma data cannot handle all situations (and this is why some are handled by EVE client internally), there are a few additions to the dogma data:
+
+- A `modifierInfo` with `LocationRequiredSkillModifier` or `OwnerRequiredSkillModifier` can have their `skillTypeID` set to `-1`.
+  This can be used on effects defined by skills, and they cause the effect to be applied for any location / owner that has that skill as required skill.
+
+NOTE: patches might create new attributes or effects.
+New attributes and effects always have a negative ID, to quickly identify that they are not part of the original SDE.
+The order of these attributes can change between builds; so use their name to find their ID.
+As you should with any other attribute or effect.
