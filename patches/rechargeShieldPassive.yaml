@@ -1,0 +1,61 @@
+description: |
+  This patch introduces attributes to calculate the passive shield recharge
+  rate.
+
+attributes:
+- new:
+    name: passiveShieldRechargeRate
+  published: true
+  defaultValue: 2500
+  highIsGood: true
+  stackable: true
+- new:
+    name: passiveShieldEffectiveRechargeRate
+  published: true
+  defaultValue: 2500
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: passiveShieldRechargeRate
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: passiveShieldRechargeRate
+    modifyingAttribute: shieldRechargeRate
+    operation: postDiv
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: passiveShieldRechargeRate
+    modifyingAttribute: shieldCapacity
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: passiveShieldEffectiveRechargeRate
+    modifyingAttribute: shieldRechargeRate
+    operation: postDiv
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: passiveShieldEffectiveRechargeRate
+    modifyingAttribute: shieldCapacity
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: passiveShieldEffectiveRechargeRate
+    modifyingAttribute: shieldDamageEffectiveResonance
+    operation: postDiv
+
+typeDogma:
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: passiveShieldRechargeRate
+    isDefault: false

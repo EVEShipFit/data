@@ -1,0 +1,49 @@
+description: |
+  Shield, armor, and hull are presented as Hitpoints by the dogma. However, a
+  more realistic value to show the user is Effective Hitpoints, which takes
+  resistance into account.
+
+  This patch adds up the Effective Hitpoints of those three, into a single
+  attribute, representing the total eHP.
+
+attributes:
+- new:
+    name: ehp
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: ehp
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: ehp
+    modifyingAttribute: shieldEhp
+    operation: modAdd
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: ehp
+    modifyingAttribute: armorEhp
+    operation: modAdd
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: ehp
+    modifyingAttribute: hullEhp
+    operation: modAdd
+
+typeDogma:
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: ehp
+    isDefault: false

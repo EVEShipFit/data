@@ -1,0 +1,283 @@
+description: |
+  Patch in an attribute to indicate the DPS (with and without reload).
+
+attributes:
+- new:
+    name: damagePerSecondWithoutReload
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: damagePerSecondWithReload
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: droneDamagePerSecond
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+- new:
+    name: speedOfReload
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: speedWithReload
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: damagePerSecondBasedOnSpeed
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithoutReload
+    modifyingAttribute: speed
+    operation: postDiv
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: speedWithReload
+    modifyingAttribute: speed
+    operation: preAssign
+
+- new:
+    name: damagePerSecondBasedOnDuration
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithoutReload
+    modifyingAttribute: duration
+    operation: postDiv
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: speedWithReload
+    modifyingAttribute: duration
+    operation: preAssign
+
+- new:
+    name: damagePerSecondWithoutReload
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithoutReload
+    modifyingAttribute: thousand
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithoutReload
+    modifyingAttribute: damageVolley
+    operation: postMul
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithoutReload
+    modifyingAttribute: damagePerSecondWithoutReload
+    operation: modAdd
+
+- new:
+    name: damagePerSecondWithReload
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: speedOfReload
+    modifyingAttribute: reloadTime
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: speedOfReload
+    modifyingAttribute: chargeAmount
+    operation: postDiv
+
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: speedWithReload
+    modifyingAttribute: speedOfReload
+    operation: modAdd
+
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithReload
+    modifyingAttribute: thousand
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithReload
+    modifyingAttribute: damageVolley
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithReload
+    modifyingAttribute: speedWithReload
+    operation: postDiv
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithReload
+    modifyingAttribute: damagePerSecondWithReload
+    operation: modAdd
+
+- new:
+    name: damagePerSecondWithReloadDrone
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: droneDamagePerSecond
+    modifyingAttribute: damagePerSecondWithoutReload
+    operation: modAdd
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithReload
+    modifyingAttribute: damagePerSecondWithoutReload
+    operation: modAdd
+
+typeDogma:
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: speed
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  - category: Module
+    hasAllAttributes:
+    - name: speed
+    hasAnyEffects:
+    - name: useMissiles
+    - name: turretFitted
+  - category: Drone
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  dogmaEffects:
+  - effect: damagePerSecondBasedOnSpeed
+    isDefault: false
+  - effect: damagePerSecondWithoutReload
+    isDefault: false
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: speed
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  - category: Module
+    hasAllAttributes:
+    - name: speed
+    hasAnyEffects:
+    - name: useMissiles
+    - name: turretFitted
+  dogmaEffects:
+  - effect: damagePerSecondWithReload
+    isDefault: false
+
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: duration
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  - category: Module
+    hasAllAttributes:
+    - name: duration
+    hasAnyEffects:
+    - name: useMissiles
+    - name: turretFitted
+  dogmaEffects:
+  - effect: damagePerSecondBasedOnDuration
+    isDefault: false
+  - effect: damagePerSecondWithoutReload
+    isDefault: false
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: duration
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  - category: Module
+    hasAllAttributes:
+    - name: duration
+    hasAnyEffects:
+    - name: useMissiles
+    - name: turretFitted
+  dogmaEffects:
+  - effect: damagePerSecondWithReload
+    isDefault: false
+
+- patch:
+  - category: Drone
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  - category: Module
+    hasAllAttributes:
+    - name: duration
+    hasAnyAttributes:
+    - name: emDamage
+    - name: explosiveDamage
+    - name: kineticDamage
+    - name: thermalDamage
+  - category: Module
+    hasAllAttributes:
+    - name: duration
+    hasAnyEffects:
+    - name: useMissiles
+    - name: turretFitted
+  dogmaEffects:
+  - effect: damagePerSecondWithReloadDrone
+    isDefault: false

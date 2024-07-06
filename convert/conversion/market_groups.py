@@ -6,8 +6,8 @@ import esf_pb2
 from google.protobuf.json_format import MessageToJson
 
 
-def convert(path):
-    print("Converting marketGroups ...")
+def convert(path, data):
+    print("Loading marketGroups ...")
 
     try:
         with open(f"{path}/marketGroups.yaml") as fp:
@@ -16,6 +16,11 @@ def convert(path):
         with open(f"{path}/marketgroups.json") as fp:
             marketGroups = json.load(fp)
             marketGroups = {int(k): v for k, v in marketGroups.items()}
+
+    data["marketGroups"] = marketGroups
+    yield
+
+    print("Converting marketGroups ...")
 
     pb2 = esf_pb2.MarketGroups()
 

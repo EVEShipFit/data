@@ -1,0 +1,88 @@
+description: |
+  This patch introduces attributes to calculate the shield boost rate.
+
+  It calculates this for both modules that influence the shield boost rate,
+  and for the ship that receives the shield boost rate.
+
+attributes:
+- new:
+    name: shieldBoostRate
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: shieldEffectiveBoostRate
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: shieldBoostRate
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: shieldBoostRate
+    modifyingAttribute: thousand
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: shieldBoostRate
+    modifyingAttribute: shieldBonus
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: shieldBoostRate
+    modifyingAttribute: duration
+    operation: postDiv
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: shieldBoostRate
+    modifyingAttribute: shieldBoostRate
+    operation: modAdd
+
+- new:
+    name: shieldEffectiveBoostRate
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: shieldEffectiveBoostRate
+    modifyingAttribute: shieldBoostRate
+    operation: modAdd
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: shieldEffectiveBoostRate
+    modifyingAttribute: shieldDamageEffectiveResonance
+    operation: postDiv
+
+typeDogma:
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: shieldBonus
+    hasAnyEffects:
+    - name: shieldBoosting
+  dogmaEffects:
+  - effect: shieldBoostRate
+    isDefault: false
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: shieldEffectiveBoostRate
+    isDefault: false

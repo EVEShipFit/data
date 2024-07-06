@@ -1,0 +1,196 @@
+description: |
+  Patch in an attributes to indicate several capacitor-related information.
+
+  - capacitorPeakRecharge shows in GJ/s how much recharge there would be at
+    the peak.
+  - capacitorPeakLoad shows the amount of drain (in GJ) there would be if
+    all modules activate at once.
+  - capacitorPeakDelta / capacitorPeakDeltaPercentage is the difference
+    between those two.
+
+attributes:
+- new:
+    name: capacitorPeakRecharge
+  published: true
+  # Peak Recharge is 5.0 / 2.0 * <capacitorCapacity> / <rechargeRate>
+  defaultValue: 2.5
+  highIsGood: true
+  stackable: true
+- new:
+    name: capacitorPeakLoad
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: capacitorPeakDelta
+    id: -1
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: capacitorPeakDeltaPercentage
+  published: true
+  defaultValue: 100
+  highIsGood: true
+  stackable: true
+
+# Not calculated via dogma, as this requires simulation. This has to be
+# calculated and set by the dogma-engine.
+- new:
+    name: capacitorDepletesIn
+    id: -2
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: capacitorPeakRecharge
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakRecharge
+    modifyingAttribute: capacitorCapacity
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakRecharge
+    modifyingAttribute: rechargeRate
+    operation: postDiv
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakRecharge
+    modifyingAttribute: thousand
+    operation: postMul
+
+- new:
+    name: capacitorPeakLoadDuration
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakLoad
+    modifyingAttribute: capacitorNeed
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakLoad
+    modifyingAttribute: duration
+    operation: postDiv
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakLoad
+    modifyingAttribute: thousand
+    operation: postMul
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakLoad
+    modifyingAttribute: capacitorPeakLoad
+    operation: modAdd
+- new:
+    name: capacitorPeakLoadSpeed
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakLoad
+    modifyingAttribute: capacitorNeed
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakLoad
+    modifyingAttribute: speed
+    operation: postDiv
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakLoad
+    modifyingAttribute: thousand
+    operation: postMul
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakLoad
+    modifyingAttribute: capacitorPeakLoad
+    operation: modAdd
+
+- new:
+    name: capacitorPeakDelta
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakDelta
+    modifyingAttribute: capacitorPeakRecharge
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakDelta
+    modifyingAttribute: capacitorPeakLoad
+    operation: modSub
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakDeltaPercentage
+    modifyingAttribute: capacitorPeakDelta
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: capacitorPeakDeltaPercentage
+    modifyingAttribute: capacitorPeakRecharge
+    operation: postDiv
+
+typeDogma:
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: capacitorPeakRecharge
+    isDefault: false
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: capacitorNeed
+    # Some modules use "duration" for their cycle time.
+    - name: duration
+  dogmaEffects:
+  - effect: capacitorPeakLoadDuration
+    isDefault: false
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: capacitorNeed
+    # Other modules use "speed" for their cycle time.
+    - name: speed
+  dogmaEffects:
+  - effect: capacitorPeakLoadSpeed
+    isDefault: false
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: capacitorPeakDelta
+    isDefault: false

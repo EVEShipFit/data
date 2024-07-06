@@ -1,0 +1,9 @@
+description: |
+  The dogma data has an effect "online" that is in the "active" category. The
+  EVE client internally does some magic here, but in our case, it should
+  always be in the "online" category.
+
+effects:
+- patch:
+  - name: online
+  effectCategory: online

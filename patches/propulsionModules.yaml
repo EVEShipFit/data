@@ -1,0 +1,76 @@
+description: |
+  AfterBurners and MicroWarpDrives do not have an "active" effect in the dogma
+  data. The EVE client normally takes care of this outside of the dogma.
+
+  This patch adds an "active" effect to the dogma, so there is no need for
+  special casing in the dogma-engine.
+
+  Note: the attribute "mass" is not correct in the SDE, and instead the "mass"
+  field of the type should be used. This patch assumes another patch fixes up
+  the attribute "mass", so it does correctly reflect the mass of the ship.
+
+attributes:
+- new:
+    name: velocityBoost
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: velocityBoost
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: velocityBoost
+    modifyingAttribute: mass
+    operation: postDiv
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: maxVelocity
+    modifyingAttribute: velocityBoost
+    operation: postPercent
+
+- patch:
+  - name: moduleBonusMicrowarpdrive
+  modifierInfo:
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: signatureRadius
+    modifyingAttribute: signatureRadiusBonus
+    operation: postPercent
+
+- patch:
+  - name: moduleBonusAfterburner
+  - name: moduleBonusMicrowarpdrive
+  modifierInfo:
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: mass
+    modifyingAttribute: massAddition
+    operation: modAdd
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: velocityBoost
+    modifyingAttribute: speedBoostFactor
+    operation: modAdd
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: velocityBoost
+    modifyingAttribute: speedFactor
+    operation: postMul
+
+typeDogma:
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: velocityBoost
+    isDefault: false

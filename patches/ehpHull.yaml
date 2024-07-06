@@ -1,0 +1,140 @@
+description: |
+  Shield, armor, and hull are presented as Hitpoints by the dogma. However, a
+  more realistic value to show the user is Effective Hitpoints, which takes
+  resistance into account.
+
+  This patch creates a few new attributes to calculate the effective hitpoints
+  of hull. There are two similar patch-files that do this for the other two.
+
+attributes:
+- new:
+    name: hullEmDamageEffectiveResonance
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: hullExplosiveDamageEffectiveResonance
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: hullKineticDamageEffectiveResonance
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: hullThermalDamageEffectiveResonance
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+- new:
+    name: hullDamageEffectiveResonance
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+- new:
+    name: hullEhp
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: hullEhp
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullEmDamageEffectiveResonance
+    modifyingAttribute: damageProfileEm
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullEmDamageEffectiveResonance
+    modifyingAttribute: emDamageResonance
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullDamageEffectiveResonance
+    modifyingAttribute: hullEmDamageEffectiveResonance
+    operation: modAdd
+
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullExplosiveDamageEffectiveResonance
+    modifyingAttribute: damageProfileExplosive
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullExplosiveDamageEffectiveResonance
+    modifyingAttribute: explosiveDamageResonance
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullDamageEffectiveResonance
+    modifyingAttribute: hullExplosiveDamageEffectiveResonance
+    operation: modAdd
+
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullKineticDamageEffectiveResonance
+    modifyingAttribute: damageProfileKinetic
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullKineticDamageEffectiveResonance
+    modifyingAttribute: kineticDamageResonance
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullDamageEffectiveResonance
+    modifyingAttribute: hullKineticDamageEffectiveResonance
+    operation: modAdd
+
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullThermalDamageEffectiveResonance
+    modifyingAttribute: damageProfileThermal
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullThermalDamageEffectiveResonance
+    modifyingAttribute: thermalDamageResonance
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullDamageEffectiveResonance
+    modifyingAttribute: hullThermalDamageEffectiveResonance
+    operation: modAdd
+
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullEhp
+    modifyingAttribute: hp
+    operation: preAssign
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: hullEhp
+    modifyingAttribute: hullDamageEffectiveResonance
+    operation: postDiv
+
+typeDogma:
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: hullEhp
+    isDefault: false

@@ -1,0 +1,50 @@
+description: |
+  Patch in an attribute to indicate the align time (in seconds).
+
+attributes:
+- new:
+    name: alignTime
+  published: true
+  # -ln(0.25) == 1.3862943611198906
+  defaultValue: 1.3862943611198906
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: alignTime
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: alignTime
+    modifyingAttribute: agility
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: alignTime
+    modifyingAttribute: mass
+    operation: postMul
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: alignTime
+    modifyingAttribute: thousand
+    operation: postDiv
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: alignTime
+    modifyingAttribute: thousand
+    operation: postDiv
+
+typeDogma:
+- patch:
+  - category: Ship
+  dogmaEffects:
+  - effect: alignTime
+    isDefault: false

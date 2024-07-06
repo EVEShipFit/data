@@ -1,0 +1,46 @@
+description: |
+  Patch in an attribute to indicate how much drones are active and how much
+  bandwidth they consume.
+
+attributes:
+- new:
+    name: droneActive
+  published: true
+  defaultValue: 0
+  highIsGood: true
+  stackable: true
+- new:
+    name: droneUsage
+  published: true
+  defaultValue: 1
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: droneActive
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: droneActive
+    modifyingAttribute: droneUsage
+    operation: modAdd
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: droneBandwidthLoad
+    modifyingAttribute: droneBandwidthUsed
+    operation: modAdd
+
+typeDogma:
+- patch:
+  - category: Drone
+  dogmaEffects:
+  - effect: droneActive
+    isDefault: false

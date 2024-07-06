@@ -1,0 +1,65 @@
+description: |
+  Some damage skills have effects that are applied by the EVE client itself,
+  as they would be very complicated to define in the dogma data.
+
+  This patch uses an addition to the dogma-engine, which allows an effect of
+  a skill to be applied on any location / owner that has that skill listed as
+  "required skill".
+
+effects:
+- patch:
+  - name: missileEMDmgBonus
+  modifierInfo:
+  - domain: charID
+    func: OwnerRequiredSkillModifier
+    skillType: IfSkillRequired
+    modifiedAttribute: emDamage
+    modifyingAttribute: damageMultiplierBonus
+    operation: postPercent
+- patch:
+  - name: missileExplosiveDmgBonus
+  modifierInfo:
+  - domain: charID
+    func: OwnerRequiredSkillModifier
+    skillType: IfSkillRequired
+    modifiedAttribute: explosiveDamage
+    modifyingAttribute: damageMultiplierBonus
+    operation: postPercent
+- patch:
+  - name: missileKineticDmgBonus2
+  modifierInfo:
+  - domain: charID
+    func: OwnerRequiredSkillModifier
+    skillType: IfSkillRequired
+    modifiedAttribute: kineticDamage
+    modifyingAttribute: damageMultiplierBonus
+    operation: postPercent
+- patch:
+  - name: missileThermalDmgBonus
+  modifierInfo:
+  - domain: charID
+    func: OwnerRequiredSkillModifier
+    skillType: IfSkillRequired
+    modifiedAttribute: thermalDamage
+    modifyingAttribute: damageMultiplierBonus
+    operation: postPercent
+
+- patch:
+  - name: selfRof
+  modifierInfo:
+  - domain: shipID
+    func: LocationRequiredSkillModifier
+    skillType: IfSkillRequired
+    modifiedAttribute: speed
+    modifyingAttribute: rofBonus
+    operation: postPercent
+
+- patch:
+  - name: droneDmgBonus
+  modifierInfo:
+  - domain: charID
+    func: OwnerRequiredSkillModifier
+    skillType: IfSkillRequired
+    modifiedAttribute: damageMultiplier
+    modifyingAttribute: damageMultiplierBonus
+    operation: postPercent

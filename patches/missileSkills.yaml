@@ -1,0 +1,49 @@
+description: |
+  Some Missile Skills have no effect in the dogma data. The EVE client normally
+  takes care of this outside of the dogma.
+
+  This patch adds an effect for this to the dogma, so there is no need for
+  special casing in the dogma-engine.
+
+effects:
+- new:
+    name: missileDamage
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: true
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: charID
+    func: OwnerRequiredSkillModifier
+    skillType: Missile Launcher Operation
+    modifiedAttribute: emDamage
+    modifyingAttribute: missileDamageMultiplier
+    operation: postMul
+  - domain: charID
+    func: OwnerRequiredSkillModifier
+    skillType: Missile Launcher Operation
+    modifiedAttribute: explosiveDamage
+    modifyingAttribute: missileDamageMultiplier
+    operation: postMul
+  - domain: charID
+    func: OwnerRequiredSkillModifier
+    skillType: Missile Launcher Operation
+    modifiedAttribute: kineticDamage
+    modifyingAttribute: missileDamageMultiplier
+    operation: postMul
+  - domain: charID
+    func: OwnerRequiredSkillModifier
+    skillType: Missile Launcher Operation
+    modifiedAttribute: thermalDamage
+    modifyingAttribute: missileDamageMultiplier
+    operation: postMul
+
+typeDogma:
+- patch:
+  - type: CharacterType
+  dogmaEffects:
+  - effect: missileDamage
+    isDefault: false

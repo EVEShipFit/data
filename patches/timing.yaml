@@ -1,0 +1,11 @@
+description: |
+  For some millisecond -> second calculations, the value "1000" is needed. This
+  patch introduces that value, so other patches can use it.
+
+attributes:
+- new:
+    name: thousand
+  published: true
+  defaultValue: 1000
+  highIsGood: true
+  stackable: true

@@ -1,0 +1,60 @@
+description: |
+  Patch in an attribute to indicate the amount of charges that fit in a module.
+
+attributes:
+- new:
+    name: chargeAmount
+  published: true
+  defaultValue: 1
+  highIsGood: true
+  stackable: true
+
+effects:
+- new:
+    name: chargeAmount
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: chargeAmount
+    modifyingAttribute: capacity
+    operation: preAssign
+- new:
+    name: chargeAmountAmmo
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: otherID
+    func: ItemModifier
+    modifiedAttribute: chargeAmount
+    modifyingAttribute: volume
+    operation: postDiv
+
+typeDogma:
+- patch:
+  - category: Module
+    hasAnyAttributes:
+    - name: chargeGroup1
+    - name: chargeGroup2
+    - name: chargeGroup3
+    - name: chargeGroup4
+    - name: chargeGroup5
+  dogmaEffects:
+  - effect: chargeAmount
+    isDefault: false
+- patch:
+  - category: Charge
+  dogmaEffects:
+  - effect: chargeAmountAmmo
+    isDefault: false
