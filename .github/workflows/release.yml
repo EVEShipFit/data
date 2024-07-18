@@ -89,9 +89,10 @@ jobs:
 
     - name: Convert SDE YAML to Protobuf
       run: |
-        cp esf.proto dist/
         protoc --python_out=. esf.proto
         python -m convert sde
+
+        cp esf.proto dist/
 
     - name: Fetch icons
       run: |
