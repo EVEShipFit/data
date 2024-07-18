@@ -89,9 +89,9 @@ jobs:
 
     - name: Convert SDE YAML to Protobuf
       run: |
+        cp esf.proto dist/
         protoc --python_out=. esf.proto
         python -m convert sde
-        rm -rf sde_json
 
     - name: Fetch icons
       run: |
@@ -110,7 +110,7 @@ jobs:
 
     - name: Publish to R2 bucket
       run: |
-        rclone copy dist eveshipfit:eveshipfit/${{ github.event.release.tag_name }}/ --progress --exclude=*.{js,js.map,d.ts}
+        rclone copy dist eveshipfit:eveshipfit/${{ github.event.release.tag_name }}/ --progress --include=*.{pb2,png}
       env:
         RCLONE_CONFIG_EVESHIPFIT_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
         RCLONE_CONFIG_EVESHIPFIT_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
