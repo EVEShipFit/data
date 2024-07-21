@@ -1,5 +1,5 @@
 def patch(entries, patches, data):
-    nextAttributeID = -100  # We start some IDs away from 0, so we can have a few reserved numbers.
+    nextAttributeID = -1
 
     for patch in patches:
         if patch.get("new"):
