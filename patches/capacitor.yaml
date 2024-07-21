@@ -17,6 +17,12 @@ attributes:
   highIsGood: true
   stackable: true
 - new:
+    name: cycleTime
+  published: true
+  defaultValue: 0
+  highIsGood: false
+  stackable: true
+- new:
     name: capacitorPeakLoad
   published: true
   defaultValue: 0
@@ -24,7 +30,6 @@ attributes:
   stackable: true
 - new:
     name: capacitorPeakDelta
-    id: -1
   published: true
   defaultValue: 0
   highIsGood: true
@@ -40,7 +45,6 @@ attributes:
 # calculated and set by the dogma-engine.
 - new:
     name: capacitorDepletesIn
-    id: -2
   published: true
   defaultValue: 0
   highIsGood: true
@@ -74,7 +78,7 @@ effects:
     operation: postMul
 
 - new:
-    name: capacitorPeakLoadDuration
+    name: cycleTimeDuration
   effectCategory: active
   electronicChance: false
   isAssistance: false
@@ -85,26 +89,56 @@ effects:
   modifierInfo:
   - domain: itemID
     func: ItemModifier
-    modifiedAttribute: capacitorPeakLoad
-    modifyingAttribute: capacitorNeed
-    operation: preAssign
-  - domain: itemID
-    func: ItemModifier
-    modifiedAttribute: capacitorPeakLoad
+    modifiedAttribute: cycleTime
     modifyingAttribute: duration
-    operation: postDiv
-  - domain: itemID
-    func: ItemModifier
-    modifiedAttribute: capacitorPeakLoad
-    modifyingAttribute: thousand
-    operation: postMul
-  - domain: shipID
-    func: ItemModifier
-    modifiedAttribute: capacitorPeakLoad
-    modifyingAttribute: capacitorPeakLoad
     operation: modAdd
 - new:
-    name: capacitorPeakLoadSpeed
+    name: cycleTimeDurationHighisGood
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: cycleTime
+    modifyingAttribute: durationHighisGood
+    operation: modAdd
+- new:
+    name: cycleTimeSpeed
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: cycleTime
+    modifyingAttribute: speed
+    operation: modAdd
+- new:
+    name: cycleTimeReactivationDelay
+  effectCategory: active
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: itemID
+    func: ItemModifier
+    modifiedAttribute: cycleTime
+    modifyingAttribute: moduleReactivationDelay
+    operation: modAdd
+- new:
+    name: capacitorPeakLoad
   effectCategory: active
   electronicChance: false
   isAssistance: false
@@ -121,7 +155,7 @@ effects:
   - domain: itemID
     func: ItemModifier
     modifiedAttribute: capacitorPeakLoad
-    modifyingAttribute: speed
+    modifyingAttribute: cycleTime
     operation: postDiv
   - domain: itemID
     func: ItemModifier
@@ -175,10 +209,26 @@ typeDogma:
   - category: Module
     hasAllAttributes:
     - name: capacitorNeed
+  dogmaEffects:
+  - effect: capacitorPeakLoad
+    isDefault: false
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: capacitorNeed
     # Some modules use "duration" for their cycle time.
     - name: duration
   dogmaEffects:
-  - effect: capacitorPeakLoadDuration
+  - effect: cycleTimeDuration
+    isDefault: false
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: capacitorNeed
+    # Some modules use "durationHighisGood" for their cycle time.
+    - name: durationHighisGood
+  dogmaEffects:
+  - effect: cycleTimeDurationHighisGood
     isDefault: false
 - patch:
   - category: Module
@@ -187,7 +237,16 @@ typeDogma:
     # Other modules use "speed" for their cycle time.
     - name: speed
   dogmaEffects:
-  - effect: capacitorPeakLoadSpeed
+  - effect: cycleTimeSpeed
+    isDefault: false
+- patch:
+  - category: Module
+    hasAllAttributes:
+    - name: capacitorNeed
+    # Other modules use "moduleReactivationDelay" for their cycle time.
+    - name: moduleReactivationDelay
+  dogmaEffects:
+  - effect: cycleTimeReactivationDelay
     isDefault: false
 - patch:
   - category: Ship
