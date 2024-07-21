@@ -49,6 +49,15 @@ effects:
     operation: postPercent
 
 - patch:
+  - name: microJumpDrive
+  modifierInfo:
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: signatureRadius
+    modifyingAttribute: signatureRadiusBonusPercent
+    operation: postPercent
+
+- patch:
   - name: moduleBonusAfterburner
   - name: moduleBonusMicrowarpdrive
   modifierInfo:
