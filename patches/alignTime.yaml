@@ -7,7 +7,7 @@ attributes:
   published: true
   # -ln(0.25) == 1.3862943611198906
   defaultValue: 1.3862943611198906
-  highIsGood: true
+  highIsGood: false
   stackable: true
 
 effects:
