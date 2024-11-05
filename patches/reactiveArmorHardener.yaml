@@ -1,0 +1,27 @@
+description: |
+  Patch in armor resistance modifiers for the reactive armor hardener.
+
+effects:
+- patch:
+  - name: adaptiveArmorHardener
+  modifierInfo:
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: armorEmDamageResonance
+    modifyingAttribute: armorEmDamageResonance
+    operation: preMul
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: armorExplosiveDamageResonance
+    modifyingAttribute: armorExplosiveDamageResonance
+    operation: preMul
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: armorKineticDamageResonance
+    modifyingAttribute: armorKineticDamageResonance
+    operation: preMul
+  - domain: shipID
+    func: ItemModifier
+    modifiedAttribute: armorThermalDamageResonance
+    modifyingAttribute: armorThermalDamageResonance
+    operation: preMul
