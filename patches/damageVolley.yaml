@@ -43,6 +43,33 @@ effects:
     operation: modAdd
 
 - new:
+    name: damageVolleyDot
+  effectCategory: passive
+  electronicChance: false
+  isAssistance: false
+  isOffensive: false
+  isWarpSafe: true
+  propulsionChance: false
+  rangeChance: false
+  modifierInfo:
+  - domain: otherID
+    func: ItemModifier
+    modifiedAttribute: damageVolley
+    modifyingAttribute: dotMaxDamagePerTick
+    operation: modAdd
+  # Overwrite the module DPS, as we show it per target, not what the module in a hypothetical situation could do.
+  - domain: otherID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithReload
+    modifyingAttribute: dotMaxDamagePerTick
+    operation: postAssign
+  - domain: otherID
+    func: ItemModifier
+    modifiedAttribute: damagePerSecondWithoutReload
+    modifyingAttribute: dotMaxDamagePerTick
+    operation: postAssign
+
+- new:
     name: damageVolley
   effectCategory: passive
   electronicChance: false
@@ -90,6 +117,14 @@ effects:
     operation: postMul
 
 typeDogma:
+- patch:
+  - category: Charge
+    hasAnyAttributes:
+    - name: dotMaxDamagePerTick
+  dogmaEffects:
+  - effect: damageVolleyDot
+    isDefault: false
+
 - patch:
   - category: Charge
     hasAnyAttributes:
